@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sendlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/text_message_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/rounded_rectangle_send"
+            android:maxWidth="240dp"
+            android:padding="10dp"
+            android:text="hello hello"
+            android:textColor="@android:color/black"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ImgSendMsgEdited"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toTopOf="@+id/Img_send_msg_seen"
+            app:layout_constraintEnd_toStartOf="@+id/text_message_time"
+           android:src="@drawable/edit" />
+
+        <TextView
+            android:id="@+id/text_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="@string/sending"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/text_message_body"
+            app:layout_constraintRight_toLeftOf="@+id/text_message_body"
+            tools:ignore="DuplicateIds" />
+
+        <ImageView
+            android:id="@+id/Img_send_msg_seen"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="8dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/text_message_time"
+            app:layout_constraintEnd_toStartOf="@+id/text_message_time"
+            app:layout_constraintTop_toBottomOf="@+id/text_message_time"
+            app:srcCompat="@mipmap/seen" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+
+        android:id="@+id/resive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:visibility="visible"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp">
+
+        <ImageView
+            android:id="@+id/image_message_profile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/operator"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_message_name"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="john_doe"
+            android:textSize="12sp"
+            app:layout_constraintLeft_toRightOf="@+id/image_message_profile"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_message_body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/rounded_rectangle_resive"
+            android:maxWidth="240dp"
+            android:padding="10dp"
+            android:text="hi_man_how_are_you"
+            android:textColor="@android:color/black"
+            app:layout_constraintLeft_toRightOf="@+id/image_message_profile"
+            app:layout_constraintTop_toBottomOf="@+id/text_message_name" />
+
+        <TextView
+            android:id="@+id/text_message_time1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="11:40"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/text_message_body1"
+            app:layout_constraintLeft_toRightOf="@+id/text_message_body1" />
+
+        <ImageView
+            android:id="@+id/ImgReceiveMsgEdited"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+
+            app:layout_constraintBottom_toBottomOf="@+id/text_message_time1"
+            app:layout_constraintStart_toEndOf="@+id/text_message_time1"
+            app:srcCompat="@drawable/edit"
+            tools:ignore="VectorDrawableCompat" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sendImgLay"
+        android:layoutDirection="ltr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="@+id/reciveImgLay"
+        tools:ignore="MissingConstraints">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.35" />
+
+        <ImageView
+            android:id="@+id/image_message_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:maxHeight="500dp"
+            android:onClick="ZoomPic"
+            android:padding="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/unknowimage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_image_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/sending"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_message_body"
+            app:layout_constraintEnd_toStartOf="@+id/image_message_body"
+            tools:ignore="DuplicateIds" />
+
+        <ImageView
+            android:id="@+id/Img_Send_img_seen"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="2dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/text_image_time"
+            app:layout_constraintEnd_toStartOf="@+id/text_image_time"
+            app:layout_constraintTop_toBottomOf="@+id/text_image_time"
+            app:srcCompat="@mipmap/seen" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/reciveImgLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        android:layoutDirection="ltr"
+        app:layout_constraintTop_toTopOf="@+id/sendlay"
+        tools:ignore="MissingConstraints">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.65" />
+
+        <ImageView
+            android:id="@+id/image_message_body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:maxHeight="500dp"
+            android:padding="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/unknowimage"
+            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text_image_time1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="11_40"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/image_message_body1"
+            app:layout_constraintStart_toEndOf="@+id/image_message_body1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sendVideoLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layoutDirection="ltr"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp">
+
+
+        <VideoView
+            android:id="@+id/Video_message_body"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginEnd="8dp"
+            android:maxHeight="500dp"
+            android:onClick="OpenVideo"
+            android:padding="8dp"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/Play_video"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="@+id/Video_message_body"
+            app:layout_constraintEnd_toEndOf="@+id/Video_message_body"
+            app:layout_constraintStart_toStartOf="@+id/Video_message_body"
+            app:layout_constraintTop_toTopOf="@+id/Video_message_body"
+            app:srcCompat="@android:drawable/ic_media_play" />
+
+        <TextView
+            android:id="@+id/text_Video_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/sending"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/Video_message_body"
+            app:layout_constraintEnd_toStartOf="@+id/Video_message_body"
+            tools:ignore="DuplicateIds" />
+
+        <ImageView
+            android:id="@+id/Img_Send_video_seen"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="2dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/text_Video_time"
+            app:layout_constraintEnd_toStartOf="@+id/text_Video_time"
+            app:layout_constraintTop_toBottomOf="@+id/text_Video_time"
+            app:srcCompat="@mipmap/seen" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/reciveVideoLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layoutDirection="ltr"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp">
+
+
+        <VideoView
+            android:id="@+id/Video_message_body1"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginLeft="8dp"
+            android:maxHeight="500dp"
+            android:onClick="OpenVideo1"
+            android:padding="8dp"
+            android:scaleType="fitXY"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/Play_video1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="@+id/Video_message_body1"
+            app:layout_constraintEnd_toEndOf="@+id/Video_message_body1"
+            app:layout_constraintStart_toStartOf="@+id/Video_message_body1"
+            app:layout_constraintTop_toTopOf="@+id/Video_message_body1"
+            app:srcCompat="@android:drawable/ic_media_play"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/text_Video_time1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="4dp"
+            android:text="11_40"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/Video_message_body1"
+            app:layout_constraintStart_toEndOf="@+id/Video_message_body1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sendVoiceLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:ignore="MissingConstraints"
+        android:layoutDirection="ltr"
+        tools:layout_editor_absoluteY="8dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/LightBlue"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/play_Voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/click_bg"
+                android:onClick="playVoice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_Voice_name"
+                app:srcCompat="@android:drawable/ic_media_play"
+                tools:ignore="ContentDescription" />
+
+            <ImageButton
+                android:id="@+id/pause_Voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/click_bg"
+                android:onClick="pauseVoice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/play_Voice"
+                app:layout_constraintTop_toBottomOf="@+id/txt_Voice_name"
+                app:srcCompat="@android:drawable/ic_media_pause"
+                tools:ignore="ContentDescription" />
+
+
+            <TextView
+                android:id="@+id/txt_Voice_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/voice"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/text_Voice_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/sending"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"
+            app:layout_constraintEnd_toStartOf="@+id/constraintLayout"
+            tools:ignore="DuplicateIds" />
+
+        <ImageView
+            android:id="@+id/Img_Send_voice_seen"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="2dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/text_Voice_time"
+            app:layout_constraintEnd_toStartOf="@+id/text_Voice_time"
+            app:layout_constraintTop_toBottomOf="@+id/text_Voice_time"
+            app:srcCompat="@mipmap/seen" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/resiveVoiceLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layoutDirection="ltr"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout2"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/LightBlue"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/play_Voice1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/click_bg"
+                android:onClick="playVoice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/pause_Voice1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_Voice_name1"
+                app:srcCompat="@android:drawable/ic_media_play"
+                tools:ignore="ContentDescription" />
+
+            <ImageButton
+                android:id="@+id/pause_Voice1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/click_bg"
+                android:onClick="pauseVoice"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_Voice_name1"
+                app:srcCompat="@android:drawable/ic_media_pause"
+                tools:ignore="ContentDescription" />
+
+
+            <TextView
+                android:id="@+id/txt_Voice_name1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:text="@string/voice"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/text_Voice_time1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="11_40"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/constraintLayout2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dateLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layoutDirection="ltr"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="8dp"
+        tools:visibility="gone">
+
+        <TextView
+            android:id="@+id/txt_Date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

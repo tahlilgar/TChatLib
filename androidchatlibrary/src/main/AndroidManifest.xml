@@ -1,0 +1,56 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tahlilgargroup.androidchatlibrary"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <!--<uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" /> &lt;!&ndash; for chat &ndash;&gt;
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> &lt;!&ndash; for paint &ndash;&gt;
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> &lt;!&ndash; for attach file &ndash;&gt;
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>&lt;!&ndash;device Name &ndash;&gt;
+
+    &lt;!&ndash;get notify when app is close&ndash;&gt;
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    &lt;!&ndash;<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />&ndash;&gt;&lt;!&ndash;for show dialog unable close&ndash;&gt;
+
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
+
+    &lt;!&ndash;networkSecurityConfig delete after set URLs to https   android:networkSecurityConfig="@xml/network_security_config"&ndash;&gt;
+    <application
+        android:allowBackup="true"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme"
+        android:requestLegacyExternalStorage="true"
+        android:allowClearUserData="false"
+        tools:targetAPI="19"
+        android:hardwareAccelerated="true"
+        tools:targetApi="n"
+        tools:ignore="GoogleAppIndexingWarning">
+
+
+        <activity android:name="com.tahlilgargroup.androidchatlibrary.ActivityChat"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustPan">
+
+        </activity>
+
+        &lt;!&ndash;<service android:name=".Main.Services.PublicNotificationService"/>&ndash;&gt;
+    </application>-->
+</manifest>

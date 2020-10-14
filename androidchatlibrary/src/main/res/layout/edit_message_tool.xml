@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/txtEditMessage"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/edit_text_border"
+            android:inputType="textMultiLine"
+            android:paddingStart="40dp"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/BtnOkEditMsg"
+            app:layout_constraintEnd_toStartOf="@+id/BtnCancelEditMsg"
+            app:layout_constraintStart_toEndOf="@+id/BtnOkEditMsg"
+            app:layout_constraintTop_toTopOf="@+id/BtnOkEditMsg" />
+
+        <!-- <android.support.v7.widget.CardView
+            android:id="@+id/BtnOkEditMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="45dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">-->
+
+        <ImageButton
+            android:id="@+id/BtnOkEditMsg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/click_bg"
+            android:scaleType="fitXY"
+            android:src="@drawable/ok"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <!-- </android.support.v7.widget.CardView>-->
+
+        <ImageButton
+            android:id="@+id/BtnCancelEditMsg"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/click_bg"
+            android:scaleType="centerInside"
+            android:src="@drawable/cancel"
+            app:layout_constraintBottom_toBottomOf="@+id/txtEditMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

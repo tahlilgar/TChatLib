@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AndroidChatLibrary</string>
+    <string name="DontAllowDelete">Don\'t allow delete this message </string>
+</resources>
