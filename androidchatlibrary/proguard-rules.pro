@@ -25,7 +25,7 @@
 -dontskipnonpubliclibraryclasses
 -verbose
 
-
+-repackageclasses com.tahlilgargroup.androidchatlibrary
 
 # Retrofit
 -keep class com.google.gson.** { *; }
