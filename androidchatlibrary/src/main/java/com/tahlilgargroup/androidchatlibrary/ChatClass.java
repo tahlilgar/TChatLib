@@ -56,6 +56,9 @@ public class ChatClass {
 
     public static  String API_Common_URL;
 
+    public static  String SignalRUrl;
+
+
     public  static  int appCode;
 
  /*   public static String GetMessagesRoute="";

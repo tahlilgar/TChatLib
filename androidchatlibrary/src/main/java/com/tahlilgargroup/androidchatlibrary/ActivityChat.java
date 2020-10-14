@@ -84,6 +84,7 @@ import retrofit2.Response;
 
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.ActivityChatList;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.NameFamily;
+import static com.tahlilgargroup.androidchatlibrary.ChatClass.SignalRUrl;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.appCode;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.driverID;
 import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
@@ -91,7 +92,7 @@ import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
 public class ActivityChat extends AppCompatActivity implements AudioRecordView.RecordingListener {
 
-    public static HubConnection connection = new HubConnection("http://185.153.211.103:9003/"/*http://distribution.tahlilgargroup.com/""http://transport.tahlilgargroup.ir/""http://template.tahlilgargroup.ir/api/"*//*"http://webservices.tahlilgargroup.ir/"*//*"http://distribution.tahlilgargroup.com/""http://testwebserv.tahlilgargroup.ir/"*/);
+    public static HubConnection connection = new HubConnection(SignalRUrl/*"http://185.153.211.103:9003/"http://distribution.tahlilgargroup.com/""http://transport.tahlilgargroup.ir/""http://template.tahlilgargroup.ir/api/"*//*"http://webservices.tahlilgargroup.ir/"*//*"http://distribution.tahlilgargroup.com/""http://testwebserv.tahlilgargroup.ir/"*/);
     public static HubProxy hub = connection.createHubProxy("NotificationHub");
     public static String id;
     //ابزار ضبط صدا در چت
