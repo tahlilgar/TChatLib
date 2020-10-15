@@ -1391,7 +1391,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
             Time today = new Time(Time.getCurrentTimezone());
             today.setToNow();
             String time = (today.format("%k:%M:%S"));
-            String name = driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-'); // UUID.randomUUID().toString();
+            String name = driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-').replace('+','0'); // UUID.randomUUID().toString();
 
             File myDir = new File(/*root + "/tahlilgar"*/CommonClass.FilesPath);
             myDir.mkdirs();
@@ -1796,7 +1796,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                     today.setToNow();
 
                     String time = (today.format("%k:%M:%S"));  // Current time
-                    name = "" + driverID + "-" + id + "-" + CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-'); //UUID.randomUUID().toString();
+                    name = "" + driverID + "-" + id + "-" + CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-').replace('+','0'); //UUID.randomUUID().toString();
                     File storeDirectory12 = new File(CommonClass.FilesPath + "/" + name + ".mp4");
 
                     ///////get video size
@@ -1948,7 +1948,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                 String time = (today.format("%k:%M:%S"));
 
-                name = "" + driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-');// UUID.randomUUID().toString();
+                name = "" + driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-').replace('+','0');// UUID.randomUUID().toString();
                 File myDirFile = new File(/*root + "/tahlilgar/"*/CommonClass.FilesPath + "/" + name + ".jpg");
 
 
@@ -1997,9 +1997,9 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                 LocalPath = CommonClass.FilesPath + "/" + name + ".jpg";
 
 
-            UploadFile(LocalPath, 1);
             if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting) {
 
+                UploadFile(LocalPath, 1);
 
             } else {
                 new CommonClass().ShowToast(getApplicationContext(), CommonClass.ToastMessages.Is_Disconnect, "");
