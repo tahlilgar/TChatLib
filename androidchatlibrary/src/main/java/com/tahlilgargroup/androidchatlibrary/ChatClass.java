@@ -25,6 +25,7 @@ import com.tahlilgargroup.commonlibrary.CommonClass;
 import java.util.ArrayList;
 import java.util.List;
 
+import microsoft.aspnet.signalr.client.ConnectionState;
 import microsoft.aspnet.signalr.client.LogLevel;
 import microsoft.aspnet.signalr.client.Logger;
 import microsoft.aspnet.signalr.client.MessageReceivedHandler;
@@ -37,11 +38,12 @@ import static com.tahlilgargroup.androidchatlibrary.ActivityChat.startConnection
 import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
 public class ChatClass {
-    public static String  driverID;
-    public static String  NameFamily;
+    public static String driverID;
+    public static String NameFamily;
 
     public static Location mCurrentLocation;
     public static boolean IsReceiveFromOtherApp = false;
+
     public enum ReceiveFromOtherAppFileType {text, image, video, none}
 
     public static ReceiveFromOtherAppFileType otherAppFileType = ReceiveFromOtherAppFileType.none;
@@ -49,17 +51,17 @@ public class ChatClass {
     public static JsonArray jsonArray;
     public static Context context;
     public static int VID;
-   // public static  Class NotifyContext;
+    // public static  Class NotifyContext;
 
     public static Class ActivityChatList;
     public static Class ActivityNotifications;
 
-    public static  String API_Common_URL;
+    public static String API_Common_URL;
 
-    public static  String SignalRUrl;
+    public static String SignalRUrl;
 
 
-    public  static  int appCode;
+    public static int appCode;
 
  /*   public static String GetMessagesRoute="";
     public static final String GetMessagesPass="";
@@ -78,87 +80,86 @@ public class ChatClass {
         GetMessagesRoute = getMessagesRoute;
     }*/
 
- public static void SetConnection()
- {
-     sse = new ServerSentEventsTransport(new Logger() {
-         @Override
-         public void log(String message, LogLevel level) {
-             Log.println(level.ordinal(), "signalr-sse", message);
-         }
-     });
+    public static void SetConnection() {
+        sse = new ServerSentEventsTransport(new Logger() {
+            @Override
+            public void log(String message, LogLevel level) {
+                Log.println(level.ordinal(), "signalr-sse", message);
+            }
+        });
 
-     startConnection();
-     CloseConnection();
-
+        startConnection();
+        CloseConnection();
 
 
-     ActivityChat.connection.received(new MessageReceivedHandler() {
-         @Override
-         public void onMessageReceived(final JsonElement json) {
-             ((Activity)context).runOnUiThread(new Runnable() {
-                 @RequiresApi(api = Build.VERSION_CODES.O)
-                 public void run() {
+        ActivityChat.connection.received(new MessageReceivedHandler() {
+            @Override
+            public void onMessageReceived(final JsonElement json) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    public void run() {
 
-                     JsonObject jsonObject = json.getAsJsonObject();
-                     if (jsonObject != null && jsonObject.has("A")) {
-                         jsonArray = jsonObject.getAsJsonArray("A");
-                         String method = jsonObject.get("M").getAsString();
-                         //PushNotifications(method,jsonArray);
-                         if (method.equals("addNewMessage")) {
-                             if (jsonArray != null && jsonArray.size() != 0) {
-                                 if (jsonArray.get(6).getAsString().equals(driverID)) {
-                                     //از حالت راهنما نتونه یه دفعه با نوتیفیکیشن بره تو چت
-                                     //if (TransportClass.showCaseView != null && !TransportClass.showCaseView.isShowing()) {
-                                     Notificate();
-                                     // }
-                                 }
-                             }
-                         } else if (method.equals("ResultNotification")) {
-                             if (jsonArray != null && jsonArray.size() != 0) {
-                                 List<Integer> OperatorOkSent = new ArrayList<>();
-                                 if (jsonArray.get(2) instanceof JsonArray) {
-                                     JsonArray array = jsonArray.get(2).getAsJsonArray();
-                                     for (int i = 0; i < array.size(); i++) {
-                                         if (i == 0) OperatorOkSent.clear();
-                                         JsonElement Operator = array.get(i);
-                                         JsonObject receiverCode = Operator.getAsJsonObject();
-                                         int s = receiverCode.get("Receiver").getAsInt();
-                                         boolean ImReceiver = s == VID;
-                                         if (ImReceiver && jsonArray.get(1).getAsBoolean()) {
-                                             PublicNotificate(new  CommonClass().ErrorMessages(jsonArray.get(0).getAsInt(), context), new CommonClass().ErrorMessages(jsonArray.get(0).getAsInt(), context));
-                                         }
-                                         int Sender = receiverCode.get("Sender").getAsInt();
-                                         boolean ImSender = Sender == VID;
-                                         if (ImSender) {
-                                             if (jsonArray.get(1).getAsBoolean()) {
-                                                 OperatorOkSent.add(receiverCode.get("Receiver").getAsInt());
-
-
-                                             } else {
-                                                 new  CommonClass().ShowToast(context, new CommonClass().ErrorMessages(11, context), Toast.LENGTH_SHORT);
-
-                                             }
-                                         }
-                                     }
+                        JsonObject jsonObject = json.getAsJsonObject();
+                        if (jsonObject != null && jsonObject.has("A")) {
+                            jsonArray = jsonObject.getAsJsonArray("A");
+                            String method = jsonObject.get("M").getAsString();
+                            //PushNotifications(method,jsonArray);
+                            if (method.equals("addNewMessage")) {
+                                if (jsonArray != null && jsonArray.size() != 0) {
+                                    if (jsonArray.get(6).getAsString().equals(driverID)) {
+                                        //از حالت راهنما نتونه یه دفعه با نوتیفیکیشن بره تو چت
+                                        //if (TransportClass.showCaseView != null && !TransportClass.showCaseView.isShowing()) {
+                                        Notificate();
+                                        // }
+                                    }
+                                }
+                            } else if (method.equals("ResultNotification")) {
+                                if (jsonArray != null && jsonArray.size() != 0) {
+                                    List<Integer> OperatorOkSent = new ArrayList<>();
+                                    if (jsonArray.get(2) instanceof JsonArray) {
+                                        JsonArray array = jsonArray.get(2).getAsJsonArray();
+                                        for (int i = 0; i < array.size(); i++) {
+                                            if (i == 0) OperatorOkSent.clear();
+                                            JsonElement Operator = array.get(i);
+                                            JsonObject receiverCode = Operator.getAsJsonObject();
+                                            int s = receiverCode.get("Receiver").getAsInt();
+                                            boolean ImReceiver = s == VID;
+                                            if (ImReceiver && jsonArray.get(1).getAsBoolean()) {
+                                                PublicNotificate(new CommonClass().ErrorMessages(jsonArray.get(0).getAsInt(), context), new CommonClass().ErrorMessages(jsonArray.get(0).getAsInt(), context));
+                                            }
+                                            int Sender = receiverCode.get("Sender").getAsInt();
+                                            boolean ImSender = Sender == VID;
+                                            if (ImSender) {
+                                                if (jsonArray.get(1).getAsBoolean()) {
+                                                    OperatorOkSent.add(receiverCode.get("Receiver").getAsInt());
 
 
-                                 }
-                                 //اگر حداقل برای یک اپراتور ارسال شد پیغام موفقیت نمایش بده
-                                 if (OperatorOkSent.size() > 0) {
-                                     new CommonClass().ShowToast(context, new  CommonClass().ErrorMessages(200, context), Toast.LENGTH_SHORT);
+                                                } else {
+                                                    new CommonClass().ShowToast(context, new CommonClass().ErrorMessages(11, context), Toast.LENGTH_SHORT);
 
-                                 }
+                                                }
+                                            }
+                                        }
 
-                             }
 
-                         }
+                                    }
+                                    //اگر حداقل برای یک اپراتور ارسال شد پیغام موفقیت نمایش بده
+                                    if (OperatorOkSent.size() > 0) {
+                                        new CommonClass().ShowToast(context, new CommonClass().ErrorMessages(200, context), Toast.LENGTH_SHORT);
 
-                     }
-                 }
-             });
-         }
-     });
- }
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     public static void Notificate() {
         try {
 
@@ -190,7 +191,6 @@ public class ChatClass {
                                                         + myContext.getApplication().getPackageName() + "/" + R.raw.sms)*//* alarmSound*//*);*/
 
 
-
                 Intent resultIntent = new Intent(context.getApplicationContext(), ActivityChatList);
                 resultIntent.putExtra("menuFragment", "favoritesMenuItem");
                 // resultIntent.putExtra("user_id", from_user_id);
@@ -206,7 +206,7 @@ public class ChatClass {
                 mBuilder.setContentIntent(resultPendingIntent);
                 int mNotificationId = jsonArray != null ? Integer.parseInt(jsonArray.get(5).getAsString()) : 1000; //(int) System.currentTimeMillis();
                 NotificationManager mNotifyMgr =
-                        (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
+                        (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     int importance = NotificationManager.IMPORTANCE_HIGH;
                     NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
@@ -245,6 +245,7 @@ public class ChatClass {
 
     /**
      * for server operation notifications
+     *
      * @param Title
      * @param Content
      */
@@ -301,6 +302,26 @@ public class ChatClass {
             Analytics.trackEvent("MainAC_PublicNotificate " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
         }
 
+    }
+
+    public static void EditOrderSignal(int OpCode,List<NotyParams> ResultNotifyParam)
+    {
+        if (ActivityChat.connection.getState() == ConnectionState.Connected &&
+                ActivityChat.connection.getState() != ConnectionState.Reconnecting &&
+                ActivityChat.connection.getState() != ConnectionState.Connecting) {
+
+            try {
+
+                ActivityChat.hub.invoke("SendNotification",OpCode,ResultNotifyParam);
+
+
+            } catch (Exception ex) {
+                Analytics.trackEvent("TransportClass_" + "EditOrderAPI1 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + ex.getMessage());
+
+            }
+        } else {
+            new CommonClass().ShowToast(context, CommonClass.ToastMessages.Is_Disconnect, "");
+        }
     }
 
 }
