@@ -35,6 +35,8 @@ import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 public class Download {
     public void DownloadAPI(final String fileName, final TextView DownloadStatus, final int messageType) {
         try {
+
+            new CommonClass().ShowWaitingDialog(ChatClass.context,"درحال دانلود...");
             APIService service =
                     ServiceGenerator.GetCommonClient().create(APIService.class);
             Call<ResponseBody> call2 = service.DownloadFile(/*0, 0,*/ fileName,appCode);
@@ -53,7 +55,9 @@ public class Download {
 
 
                             // MainActivity.ComObj.ShowToast(MainActivity.context,response.body()+"s", Toast.LENGTH_LONG);
-                            if (writeResponseBodyToDisk(response.body(), DownloadStatus, messageType)) {
+                            if (writeResponseBodyToDisk(response.body(), DownloadStatus, messageType)){
+                                new CommonClass().CancelWaitingDialog();
+
                            /* Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(PathName));
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
@@ -64,7 +68,10 @@ public class Download {
                                 Toast.makeText(MainActivity.context, "فایل بار گذاری شد اما برنامه مناسب برای باز کردن فایل پیدا نشد!", Toast.LENGTH_LONG).show();*/
 
 
-                            } else {
+                            }
+                            else {
+                                new CommonClass().CancelWaitingDialog();
+
                                 try {
                                     DownloadStatus.setText("فایل دریافت نشد!");
 
@@ -76,7 +83,10 @@ public class Download {
 
                             }
 
-                        } else {
+                        }
+                        else {
+
+                            new CommonClass().CancelWaitingDialog();
 
                             int errMsg= 0;
                             if (response != null) {
@@ -97,13 +107,17 @@ public class Download {
 
 
                         }
-                    }
+
+
+                }
 
 
 
 
                 @Override
                 public void onFailure(@Nullable Call<ResponseBody> call, @Nullable Throwable t) {
+                    new CommonClass().CancelWaitingDialog();
+
                     if (t != null) {
                         if (ChatClass.context != null)
                             new CommonClass().ShowToast(ChatClass.context, CommonClass.ToastMessages.Network_Problem, t.getMessage());
@@ -112,6 +126,7 @@ public class Download {
                 }
             });
         } catch (Exception ex) {
+            new CommonClass().CancelWaitingDialog();
             if (ChatClass.context != null) {
                 String d = ex.getMessage();
                 new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(11,ChatClass.context) + d, Toast.LENGTH_SHORT);
@@ -193,6 +208,8 @@ public class Download {
 
 
                     if (fileSize == fileSizeDownloaded) {
+                        new CommonClass().CancelWaitingDialog();
+
                         //Toast.makeText(MainActivity.context, MainActivity.ComObj.PerisanNumber(" فایل " + pos1 + " از تیکت شماره " + ticketFileName.getTicketID() + " در پوشه tahlilgar ذخیره شد"), Toast.LENGTH_SHORT).show();
                         if (messageType == 2) {
                             ActivityVideo.myVideoView.setVideoPath(futureStudioIconFile.getPath());
@@ -231,12 +248,17 @@ public class Download {
 
 
                 outputStream.flush();
+                new CommonClass().CancelWaitingDialog();
 
                 return true;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
+                new CommonClass().CancelWaitingDialog();
 
                 return false;
             } finally {
+                new CommonClass().CancelWaitingDialog();
+
                 if (inputStream != null) {
                     inputStream.close();
                 }
@@ -247,7 +269,9 @@ public class Download {
             }
 
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
+            new CommonClass().CancelWaitingDialog();
 
             return false;
         }
