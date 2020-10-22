@@ -1,6 +1,7 @@
 package com.tahlilgargroup.androidchatlibrary;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,7 +20,9 @@ import androidx.core.app.NotificationCompat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
+import com.microsoft.appcenter.crashes.Crashes;
 import com.tahlilgargroup.commonlibrary.CommonClass;
 
 import java.util.ArrayList;
@@ -81,6 +84,10 @@ public class ChatClass {
     }*/
 
     public static void SetConnection() {
+
+        AppCenter.start((Application)context, "f5e093b0-587a-43a2-8dd1-9f83e2286d26",
+                Analytics.class, Crashes.class);
+
         sse = new ServerSentEventsTransport(new Logger() {
             @Override
             public void log(String message, LogLevel level) {
