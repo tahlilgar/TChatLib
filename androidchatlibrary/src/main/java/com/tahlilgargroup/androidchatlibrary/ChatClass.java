@@ -85,8 +85,8 @@ public class ChatClass {
 
     public static void SetConnection() {
 
-        AppCenter.start((Application)context, "f5e093b0-587a-43a2-8dd1-9f83e2286d26",
-                Analytics.class, Crashes.class);
+      /*  AppCenter.start((Application)context, "f5e093b0-587a-43a2-8dd1-9f83e2286d26",
+                Analytics.class, Crashes.class);*/
 
         sse = new ServerSentEventsTransport(new Logger() {
             @Override
