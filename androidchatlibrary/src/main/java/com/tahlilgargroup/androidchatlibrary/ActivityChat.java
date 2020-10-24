@@ -544,7 +544,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
             loading.setVisibility(View.VISIBLE);
             animation.start();
             //پیام های این اپراتور را از دیتابیس بگیر
-            List<Messages> messages = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"OperatorID = '" + id + "'");
+            List<Messages> messages = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"OperatorID = '" + id + "' AND DriverID='"+driverID+"'");
 
             if (messages.size() != 0) {
 
