@@ -30,8 +30,8 @@ public class DoCommand_MessageDB {
             values.put("MsgContent", messages.getMsgContent());
             values.put("LocalPath", messages.getLocalPath());
             values.put("HostPath", messages.getHostPath());
-            values.put("DriverID", messages.getDriverID());
-            values.put("OperatorID", messages.getOperatorID());
+            values.put("DriverID", messages.getDriverID().trim());
+            values.put("OperatorID", messages.getOperatorID().trim());
             values.put("MsgDate", messages.getMsgDate());
             values.put("MsgTime", messages.getMsgTime());
             values.put("isSend", messages.getIsSend());
