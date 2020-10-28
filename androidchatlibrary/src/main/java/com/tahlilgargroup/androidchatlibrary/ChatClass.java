@@ -57,6 +57,8 @@ public class ChatClass {
 
     public static Class ActivityChatList;
     public static Class ActivityNotifications;
+    public static Class ChatMethodsClass;
+
 
     public static String API_Common_URL;
 
@@ -181,7 +183,7 @@ public class ChatClass {
                 final String NOTIFICATION_CHANNEL_ID = "10001";
                 //ActivityChat.id = jsonArray.get(2).getAsString();
 
-                String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ context.getResources().getString(R.string.label);
+               // String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ context.getResources().getString(R.string.label);
                 String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(4).getAsString() : "پیام جدید";
 
                 Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -189,7 +191,7 @@ public class ChatClass {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(R.drawable.tahlil)
-                                .setContentTitle(notification_title)
+                               // .setContentTitle(notification_title)
                                 .setContentText(notification_message)
                                 .setAutoCancel(true)
                                 .setVibrate(new long[]{100, 200, 300, 400/*, 500, 400, 300, 200, 400*/})
@@ -230,8 +232,8 @@ public class ChatClass {
 
                 Method m= null;
                 try {
-                    m = ActivityChatList.getMethod("generateContactList", Context.class);
-                    m.invoke(ActivityChatList.newInstance(),context);
+                    m = ChatMethodsClass.getMethod("generateContactList", Context.class);
+                    m.invoke(ChatMethodsClass.newInstance(),context);
 
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
@@ -248,9 +250,15 @@ public class ChatClass {
                 }
             }*/
                 //ezafe shodan new message ba amadan payam
-               /* if (curvedBottomNavigationView.getSelectedItemId() != R.id.navigation_chat)
-                    BottomMenuHelper.showBadgeMenu(getApplicationContext(), curvedBottomNavigationView, R.id.navigation_chat, "");*/
+                /*if (curvedBottomNavigationView.getSelectedItemId() != R.id.navigation_chat)
+                    BottomMenuHelper.showBadgeMenu(context, curvedBottomNavigationView, R.id.navigation_chat, "");*/
+                try {
+                    m = ChatMethodsClass.getMethod("ChatBadage");
+                    m.invoke(ChatMethodsClass.newInstance());
 
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
 
             }
         } catch (Exception e) {
