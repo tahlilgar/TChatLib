@@ -1,7 +1,6 @@
 package com.tahlilgargroup.androidchatlibrary;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,11 +19,11 @@ import androidx.core.app.NotificationCompat;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
-import com.microsoft.appcenter.crashes.Crashes;
 import com.tahlilgargroup.commonlibrary.CommonClass;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +96,7 @@ public class ChatClass {
 
         startConnection();
         CloseConnection();
+
 
 
         ActivityChat.connection.received(new MessageReceivedHandler() {
@@ -228,6 +228,14 @@ public class ChatClass {
                 }
 
 
+                Method m= null;
+                try {
+                    m = ActivityChatList.getMethod("generateContactList", Context.class);
+                    m.invoke(ActivityChatList.newInstance(),context);
+
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
                /* ActivityChatList chatlistfragment = new ActivityChatList();
                 chatlistfragment.generateData(ActivityMain.context);*/
 
