@@ -1036,9 +1036,9 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                     //Msgtext, senderid, ReceiverId, persianDate.simpleDate(),GetTimeNow(), MsgType, Convert.ToInt32(MsgID), SenderName
                                     jsonArray = jsonObject.getAsJsonArray("A");
                                     if (jsonArray != null && jsonArray.size() != 0) {
-                                        if (jsonArray.get(2).getAsString().equals(driverID))//هرپیامی برای من اومد ناتیفکیشن باید بده
+                                        if (jsonArray.get(2).getAsString().trim().equals(driverID))//هرپیامی برای من اومد ناتیفکیشن باید بده
                                             Notify();
-                                        if (jsonArray.get(1).getAsString().equals(id) && jsonArray.get(2).getAsString().equals(driverID)) {
+                                        if (jsonArray.get(1).getAsString().equals(id) && jsonArray.get(2).getAsString().trim().equals(driverID)) {
                                             //agar operator folanie va bara man ferestade
 
                                             if (jsonArray.get(5).getAsInt() == 0) {//نوع پیام متنی
@@ -1090,7 +1090,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                             if (!res)
                                                 new CommonClass().ShowToast(getApplicationContext(), "ذخیره نشد", Toast.LENGTH_SHORT);
                                             isNew = true;
-                                        } else if (jsonArray.get(1).getAsString().equals(driverID) && jsonArray.get(2).getAsString().equals(id)) {
+                                        } else if (jsonArray.get(1).getAsString().equals(driverID) && jsonArray.get(2).getAsString().trim().equals(id)) {
                                             //agar man ferestadam (2==sender id)
 
                                             // if (msgDtoList.get(jsonArray.get(6).getAsInt()).getTime() == "در حال ارسال...") {

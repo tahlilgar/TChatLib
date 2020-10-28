@@ -115,7 +115,7 @@ public class ChatClass {
                             //PushNotifications(method,jsonArray);
                             if (method.equals("addNewMessage")) {
                                 if (jsonArray != null && jsonArray.size() != 0) {
-                                    if (jsonArray.get(6).getAsString().equals(driverID)) {
+                                    if (jsonArray.get(2).getAsString().trim().equals(driverID)) {
                                         //از حالت راهنما نتونه یه دفعه با نوتیفیکیشن بره تو چت
                                         //if (TransportClass.showCaseView != null && !TransportClass.showCaseView.isShowing()) {
                                         Notificate();
