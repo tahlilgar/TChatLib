@@ -877,7 +877,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
             //اگر چت باز نیست باید اعلان بیاد
             if (active) {
                 //اگر چت بازه اگه پیام مال این اپراتور نیس باید اعلان بیاد
-                if (id != null && jsonArray != null && !id.equals(jsonArray.get(5).getAsString())) {
+                if (id != null && jsonArray != null && !id.equals(jsonArray.get(1).getAsString())) {
                     showNotifiation = true;
                 }
             } else
@@ -891,7 +891,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
             String notification_message = jsonArray.get(0).getAsString();*/
 
                 String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ getResources().getString(R.string.label);
-                String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(4).getAsString() : "پیام جدید";
+                String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(0).getAsString() : "پیام جدید";
 
                 Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -922,7 +922,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                 mBuilder.setContentIntent(resultPendingIntent);
                 //برای مدیریت نوتیفیکیشن برای هر اپراتور بصورت جدا
-                int mNotificationId = jsonArray != null ? Integer.parseInt(jsonArray.get(5).getAsString()) : 1000; //(int) System.currentTimeMillis();
+                int mNotificationId = jsonArray != null ? Integer.parseInt(jsonArray.get(1).getAsString()) : 1000; //(int) System.currentTimeMillis();
                 NotificationManager mNotifyMgr =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -174,7 +174,7 @@ public class ChatClass {
 
             boolean showNotifiation = false;
             if (ActivityChat.active) {
-                if (ActivityChat.id != null && jsonArray != null && !ActivityChat.id.equals(jsonArray.get(2).getAsString())) {
+                if (ActivityChat.id != null && jsonArray != null && !ActivityChat.id.equals(jsonArray.get(1).getAsString())) {
                     showNotifiation = true;
                 }
             } else
@@ -184,7 +184,7 @@ public class ChatClass {
                 //ActivityChat.id = jsonArray.get(2).getAsString();
 
                // String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ context.getResources().getString(R.string.label);
-                String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(4).getAsString() : "پیام جدید";
+                String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(0).getAsString() : "پیام جدید";
 
                 Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
@@ -213,7 +213,7 @@ public class ChatClass {
                         );
 
                 mBuilder.setContentIntent(resultPendingIntent);
-                int mNotificationId = jsonArray != null ? Integer.parseInt(jsonArray.get(5).getAsString()) : 1000; //(int) System.currentTimeMillis();
+                int mNotificationId = jsonArray != null ? Integer.parseInt(jsonArray.get(1).getAsString()) : 1000; //(int) System.currentTimeMillis();
                 NotificationManager mNotifyMgr =
                         (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
