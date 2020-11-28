@@ -982,11 +982,11 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                     if (connection.getState() == ConnectionState.Disconnected) {
                         //Toast.makeText(ActivityMain.context,"12",Toast.LENGTH_SHORT).show();
 
-                        txtStatus.setText("خطا در اتصال");
+                        txtStatus.setText(R.string.ConnectFaild);
                         getMsg = true;
                     }
                     if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting) {
-                        txtStatus.setText("متصل");
+                        txtStatus.setText(R.string.Connected);
                         // Toast.makeText(ActivityMain.context,"13",Toast.LENGTH_SHORT).show();
 
                         // اگر تازه متصل شده(قبلش قطعی اتصال نداشتیم)برو پیامهای جدید رو بگیر
@@ -1000,7 +1000,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                         }
                     }
                     if (connection.getState() == ConnectionState.Reconnecting || connection.getState() == ConnectionState.Connecting) {
-                        txtStatus.setText("در حال اتصال...");
+                        txtStatus.setText(R.string.Connecting);
                         //  Toast.makeText(ActivityMain.context,"14",Toast.LENGTH_SHORT).show();
 
                         getMsg = true;
@@ -1620,7 +1620,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                     @Override
                     public void run(Void aVoid) throws Exception {
 
-                        txtStatus.setText("متصل");
+                        txtStatus.setText(R.string.Connected);
                     }
                 });
 
