@@ -210,7 +210,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                 }
             }catch (Exception e)
             {
-
+                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
             }
 
 
