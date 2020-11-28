@@ -63,6 +63,7 @@ public class ChatClass {
     public static String API_Common_URL;
 
     public static String SignalRUrl;
+    public static String Locate="";
 
 
     public static int appCode;

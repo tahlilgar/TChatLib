@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
@@ -62,6 +64,7 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -83,6 +86,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.ActivityChatList;
+import static com.tahlilgargroup.androidchatlibrary.ChatClass.Locate;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.NameFamily;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.SignalRUrl;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.appCode;
@@ -181,6 +185,34 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
             context = this;
             fm = getFragmentManager();
+
+
+            try {
+
+                if(!Locate.equals(""))
+                {
+                    //set language
+                    Locale localeNew = null;
+
+                    localeNew = new Locale(Locate);
+                    Locale.setDefault(localeNew);
+
+                    Resources res = getResources();
+                    Configuration newConfig = new Configuration(res.getConfiguration());
+                    newConfig.locale = localeNew;
+                    newConfig.setLayoutDirection(localeNew);
+                    res.updateConfiguration(newConfig, res.getDisplayMetrics());
+
+                    newConfig.setLocale(localeNew);
+                    createConfigurationContext(newConfig);
+
+
+                }
+            }catch (Exception e)
+            {
+
+            }
+
 
             new CommonClass().DetectGPSTurn(ActivityChat.this);
 
