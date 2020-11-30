@@ -43,7 +43,7 @@ public class ChatClass {
     public static String driverID;
     public static String NameFamily;
 
-    public static Location mCurrentLocation;
+    //public static Location mCurrentLocation;
     public static boolean IsReceiveFromOtherApp = false;
 
     public enum ReceiveFromOtherAppFileType {text, image, video, none}

@@ -394,8 +394,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                 try {
                                     hub.invoke("Send", messagelist.get(0).getOperatorID(), messagelist.get(0).getDriverID(), editMessageView.getTxtMessage().getText().toString(), true, 0,
                                             CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                                            ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLatitude() : 0,
-                                            ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLongitude() : 0,
+                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
                                             CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), true, 1,NameFamily);
 
                                     //ActivityChat.hub.invoke("messageUpdateDelete", 0, BigInteger.valueOf(Long.parseLong(msgID)), editMessageView.getTxtMessage().getText().toString(), true, 1);//byte OpMode 0 update 1 delete,int64 id,MsgText,bool RemoveBoth,byte SenderType(if bool false senderType is 1)
@@ -555,8 +555,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
         try {
             hub.invoke(SERVER_METHOD_SEND, Integer.parseInt(id), driverID, message, true, msgType,
                     CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                    ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLatitude() : 0,
-                    ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLongitude() : 0,
+                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
                     CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", 0, false, 0,NameFamily);
             //Int16 KCode, string RCode, string Msgtext, bool SenderType, byte MsgType, string IMEI, float Lat, float Lng, string MachinName,
             // string ipAddress, string BrowserType, Int64 ID = 0, bool RemoveBoth = false, byte OpMode = 0

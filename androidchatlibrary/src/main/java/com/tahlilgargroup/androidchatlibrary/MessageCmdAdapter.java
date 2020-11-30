@@ -205,8 +205,8 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
 
                                 hub.invoke("Send", messages.get(0).getOperatorID(), messages.get(0).getDriverID(), "", true, 0,
                                         CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                                        ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLatitude() : 0,
-                                        ChatClass.mCurrentLocation != null ? ChatClass.mCurrentLocation.getLongitude() : 0,
+                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
                                         CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), isCheck, 2, NameFamily);
                             } catch (Exception ignored) {
 
