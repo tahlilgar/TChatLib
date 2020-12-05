@@ -81,7 +81,7 @@ public class ActivityImage extends AppCompatActivity {
 
                     myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                     img.setImageBitmap(myBitmap);
-                    downloadDoc.setText("ذخیره تصویر");
+                    downloadDoc.setText(getString(R.string.SaveImage) );
 
 
 
@@ -191,7 +191,7 @@ public class ActivityImage extends AppCompatActivity {
                     fos.write(bytes.toByteArray());
                     fos.flush();
                     fos.close();
-                    Toast.makeText(this, "تصویر ذخیره شد", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,getString( R.string.ImageSaved), Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     Analytics.trackEvent("ImageAC_" + "SaveImage3 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_"+DeviceProperty+"_"  + e.getMessage());
 
@@ -201,7 +201,7 @@ public class ActivityImage extends AppCompatActivity {
                 addImageToGallery(/*root +"/tahlilgar/"*/CommonClass.FilesPath+"/"+filename, ActivityImage.this);
 
             }else {
-                new CommonClass().ShowToast(ActivityImage.this,"فایل دانلود نشده!پس از اطمینان از برقراری ارتباط با اینترنت منتظر کامل شدن دانلود بمانید!",Toast.LENGTH_LONG);
+                new CommonClass().ShowToast(ActivityImage.this,getString(R.string.FileDownloadFailed),Toast.LENGTH_LONG);
             }
 
         }

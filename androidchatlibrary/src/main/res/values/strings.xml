@@ -4,4 +4,7 @@
     <string name="Connected">Connected</string>
     <string name="ConnectFaild">Connect failed</string>
     <string name="Connecting">Connecting…</string>
+    <string name="ImageSaved">Image saved</string>
+    <string name="FileDownloadFailed">File not downloaded! After making sure you are connected to the Internet, wait for the download to complete!</string>
+    <string name="SaveImage">Save</string>
 </resources>
