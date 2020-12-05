@@ -27,6 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.appCode;
+import static com.tahlilgargroup.androidchatlibrary.ChatClass.context;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.driverID;
 import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
@@ -36,7 +37,7 @@ public class Download {
     public void DownloadAPI(final String fileName, final TextView DownloadStatus, final int messageType) {
         try {
 
-            new CommonClass().ShowWaitingDialog(ChatClass.context,"درحال دانلود...");
+            new CommonClass().ShowWaitingDialog(ChatClass.context,context.getString(R.string.Downloading));
             APIService service =
                     ServiceGenerator.GetCommonClient().create(APIService.class);
             Call<ResponseBody> call2 = service.DownloadFile(/*0, 0,*/ fileName,appCode);
@@ -51,7 +52,7 @@ public class Download {
                             PathName = CommonClass.FilesPath + "/" + name;
                             //  PathName=MainActivity.context.getExternalFilesDir(null) + File.separator + UUID.randomUUID()+"."+ext;
                             // MainActivity.ComObj.ShowToast(MainActivity.context, "شروع دانلود فایل "+pos+" از تیکت شماره " +ticketFileName.getTicketID()+"...", Toast.LENGTH_SHORT);
-                            DownloadStatus.setText("درحال دریافت...");
+                            DownloadStatus.setText(context.getString( R.string.Downloading));
 
 
                             // MainActivity.ComObj.ShowToast(MainActivity.context,response.body()+"s", Toast.LENGTH_LONG);
@@ -73,7 +74,7 @@ public class Download {
                                 new CommonClass().CancelWaitingDialog();
 
                                 try {
-                                    DownloadStatus.setText("فایل دریافت نشد!");
+                                    DownloadStatus.setText(context.getString( R.string.DownloadFailed));
 
 
                                 } catch (Exception ignored) {
@@ -103,7 +104,7 @@ public class Download {
 
                             Analytics.trackEvent("Download_" + "DownloadAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_"+DeviceProperty+"_"  + errMsg);
 
-                            DownloadStatus.setText("فایل دریافت نشد!");
+                            DownloadStatus.setText(context.getString( R.string.DownloadFailed));
 
 
                         }
@@ -204,7 +205,7 @@ public class Download {
                     double f3 = i1 / Math.pow(10, N);
 
 
-                    DownloadStatus.setText(f2 + " دانلود شده از " + f3);
+                    DownloadStatus.setText(f2 + context.getString(R.string.DownloadFrom) + f3);
 
 
                     if (fileSize == fileSizeDownloaded) {
@@ -213,7 +214,7 @@ public class Download {
                         //Toast.makeText(MainActivity.context, MainActivity.ComObj.PerisanNumber(" فایل " + pos1 + " از تیکت شماره " + ticketFileName.getTicketID() + " در پوشه tahlilgar ذخیره شد"), Toast.LENGTH_SHORT).show();
                         if (messageType == 2) {
                             ActivityVideo.myVideoView.setVideoPath(futureStudioIconFile.getPath());
-                            DownloadStatus.setText("بارگیری کامل شد");//If Download completed then change button text
+                            DownloadStatus.setText(context.getString(R.string.DownloadCompleted));//If Download completed then change button text
                             break;
 
                         } else if (messageType == 1) {
@@ -222,7 +223,7 @@ public class Download {
                                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                                 ActivityImage.img.setImageBitmap(myBitmap);
                             }
-                            DownloadStatus.setText("بارگیری کامل شد");//If Download completed then change button text
+                            DownloadStatus.setText(context.getString(R.string.DownloadCompleted));//If Download completed then change button text
                             break;
 
                         } else if (messageType == 3) {

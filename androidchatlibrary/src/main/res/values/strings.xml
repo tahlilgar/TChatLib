@@ -7,4 +7,8 @@
     <string name="ImageSaved">Image saved</string>
     <string name="FileDownloadFailed">File not downloaded! After making sure you are connected to the Internet, wait for the download to complete!</string>
     <string name="SaveImage">Save</string>
+    <string name="Downloading">Downloading…</string>
+    <string name="DownloadFailed">Download failed</string>
+    <string name="DownloadFrom">Download from</string>
+    <string name="DownloadCompleted">Download completed</string>
 </resources>

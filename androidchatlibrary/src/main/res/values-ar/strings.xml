@@ -7,4 +7,8 @@
     <string name = "ImageSaved"> تم حفظ الصورة </string>
     <string name = "FileDownloadFailed"> لم يتم تنزيل الملف! انتظر حتى يكتمل التنزيل بعد التأكد من اتصالك بالإنترنت! </string>
     <string name = "SaveImage"> حفظ الصورة </string>
+    <string name="Downloading">جارى التحميل…</string>
+    <string name="DownloadFailed">التحميل فشل!</string>
+    <string name="DownloadFrom">تم التنزيل من</string>
+    <string name="DownloadCompleted">انتها التحميل</string>
 </resources>
