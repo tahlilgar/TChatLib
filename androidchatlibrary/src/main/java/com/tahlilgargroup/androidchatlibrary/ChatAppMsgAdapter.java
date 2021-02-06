@@ -707,6 +707,13 @@ public class ChatAppMsgAdapter extends RecyclerView.Adapter<ChatAppMsgViewHolder
 
     }
 
+    public void clear() {
+        int size = msgDtoList.size();
+        msgDtoList.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+
    /* public void searchedText(String txtSearch) {
         ChatAppMsgDTO msgDTO;
         if (txtSearch.length() != 0) {

@@ -123,7 +123,8 @@ public class ChatClass {
                                         // }
                                     }
                                 }
-                            } else if (method.equals("ResultNotification")) {
+                            }
+                            else if (method.equals("ResultNotification")) {
                                 if (jsonArray != null && jsonArray.size() != 0) {
                                     List<Integer> OperatorOkSent = new ArrayList<>();
                                     if (jsonArray.get(2) instanceof JsonArray) {

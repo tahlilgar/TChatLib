@@ -646,7 +646,16 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                 boolean b = Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size();
                                 boolean c = msgRecyclerView.getAdapter().getItemCount() < response.body().size();
                                 //اگر هیچ پیامی نداریم دیتابیس و لیست را از نو از سرور بگیر
-                                if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() == 0) {
+                                if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() == 0 ||
+                                        Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
+
+                                    if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
+
+                                       // new DoCommand_MessageDB(context).deleteAllMessages();
+                                        chatAppMsgAdapter.clear();
+
+                                    }
+
                                     new DoCommand_MessageDB(ActivityChat.this).deleteMessages(id);
                                     int newMsgPosition = 0;
                                     if (response.body().size() != 0)
@@ -704,18 +713,25 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                         loading.setVisibility(View.GONE);
                                         animation.stop();
                                     }
-                                } else {//پیامهایی که از سرورمیاد حتما بیشتر یا مساوی پیام های من هست پس احتمال اجرای این دستور بسیار پایین است چون من تعداد پیام هایی که دارم رو میدم ،همون تعداد یا بیشتر(پیام خوانده نشده) دریافت میکنم
-                                    if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
-                                        /*0*/
-                                        /* diff*/
-                                        if (msgRecyclerView.getAdapter().getItemCount() > response.body().size()) {
-                                            msgDtoList.subList(response.body().size(), msgRecyclerView.getAdapter().getItemCount()).clear();
+                                }
+                                else {//پیامهایی که از سرورمیاد حتما بیشتر یا مساوی پیام های من هست پس احتمال اجرای این دستور بسیار پایین است چون من تعداد پیام هایی که دارم رو میدم ،همون تعداد یا بیشتر(پیام خوانده نشده) دریافت میکنم
+                                   /* if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
+                                        *//*0*//*
+                                        *//* diff*//*
+                                       *//* if (msgRecyclerView.getAdapter().getItemCount() > response.body().size()) {
+                                            msgDtoList.subList(response.body().size(), msgRecyclerView.getAdapter().getItemCount()-1).clear();
                                         }
+
                                         chatAppMsgAdapter.notifyItemRangeRemoved(response.body().size(), msgRecyclerView.getAdapter().getItemCount() - 1);
 
-                                        mySwipe.setRefreshing(false);
+                                        mySwipe.setRefreshing(false);*//*
 
-                                    } else if (msgRecyclerView.getAdapter().getItemCount() < response.body().size()) {
+                                        new DoCommand_MessageDB(context).deleteAllMessages();
+                                        chatAppMsgAdapter.clear();
+
+
+                                    }
+                                    else*/ if (msgRecyclerView.getAdapter().getItemCount() < response.body().size()) {
                                         // اگر پیام جدیدی نسبت به دیتابیس داریم و مال این چت فعلی نیست نوتیفیکیشن بده در غیر اینصورت به لیست پیامها اضافه کن
                                         String OpID = String.valueOf(response.body().get(0).getOperatorID());
                                         if (/*!active*/(id != null && !OpID.equals(id)) || !active)
@@ -776,6 +792,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                             mySwipe.setRefreshing(false);
                                         }
                                     }
+
                                     UnreadReceivedMessages = new ArrayList<>();
                                     //همگام سازی پیام های موجود با پیام های سرور
                                     if (msgRecyclerView.getAdapter().getItemCount() == response.body().size()) {
@@ -1185,7 +1202,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                                         }
                                     }
-                                } else if (method.equals("resultChangeStatusChat")) {
+                                } else
+                                    if (method.equals("resultChangeStatusChat")) {
                                     //اپراتور یکی از پیام های ما را خوانده پس این سمت برای پیام علامت خوانده شده میخورد
                                     JsonArray json = jsonObject.getAsJsonArray("A");
                                     if (json.get(1).getAsString().equals(driverID))
@@ -1211,7 +1229,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                                 break;
                                             }
                                         }
-                                } else if (method.equals("returnChangeStatusList")) {
+                                }
+                                    else if (method.equals("returnChangeStatusList")) {
                                     //لیستی از پیام های ما که اپراتور خوانده
                                     JsonArray json = jsonObject.getAsJsonArray("A");
                                     JsonArray MsgSeenListID = json.get(0).getAsJsonArray();
@@ -1243,7 +1262,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                             }
                                         }
                                     }
-                                } else if (method.equals("resultMessageUpdateDelete")) {
+                                }
+                                    else if (method.equals("resultMessageUpdateDelete")) {
                                     JsonArray json = jsonObject.getAsJsonArray("A");
 
                                     String Msid = json.get(0).getAsString();
