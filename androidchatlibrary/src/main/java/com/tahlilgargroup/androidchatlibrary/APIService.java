@@ -1,9 +1,7 @@
 package com.tahlilgargroup.androidchatlibrary;
 
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -30,9 +28,17 @@ public interface APIService {
     Call<ResponseBody> DownloadFile(@Query("FileName") String FileName,@Query("AppCode") int AppCode);/////////////////////////////////////////////////////
 
     @Multipart
-    @POST("Common/ChatApi/UploadFile")
+    @POST("Common/ChatApi/ChatIUD")
     @Headers("apiPass: r77FtM&b7m8Se%*4")
-    Call<String> uploadMulFiles(@Part MultipartBody.Part file,@Query("AppCode") int AppCode);//////////////////////////////////////////////////////
+    Call<Integer> ChatIUD(
+            @Part("ChatParam") ChatIUDModel chatIUDModel
+            , @Part MultipartBody.Part file);/////////////////////////////////////////////////////
 
+
+//    @Multipart
+//    @POST("Common/ChatApi/UploadFile")
+//    @Headers("apiPass: r77FtM&b7m8Se%*4")
+//    Call<String> uploadMulFiles(@Part MultipartBody.Part file,@Query("AppCode") int AppCode);//////////////////////////////////////////////////////
+//
 
 }

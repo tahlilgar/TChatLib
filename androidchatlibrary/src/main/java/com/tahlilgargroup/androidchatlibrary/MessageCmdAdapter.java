@@ -11,20 +11,25 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.microsoft.appcenter.analytics.Analytics;
 import com.tahlilgargroup.commonlibrary.CommonClass;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import microsoft.aspnet.signalr.client.ConnectionState;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.tahlilgargroup.androidchatlibrary.ActivityChat.hub;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.NameFamily;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.context;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.driverID;
+import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
 
 public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> {
@@ -203,11 +208,35 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
                                     "","", ActivityMain.mCurrentLocation != null ? ActivityMain.mCurrentLocation.getLatitude() : 0,
                                     ActivityMain.mCurrentLocation != null ? ActivityMain.mCurrentLocation.getLongitude() : 0);*/
 
-                                hub.invoke("Send", messages.get(0).getOperatorID(), messages.get(0).getDriverID(), "", true, 0,
-                                        CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
-                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
-                                        CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), isCheck, 2, NameFamily);
+
+                                //////////////////////////////////////////////////////////////////////////////////////////////
+
+//                                hub.invoke("Send", messages.get(0).getOperatorID(), messages.get(0).getDriverID(), "", true, 0,
+//                                        CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
+//                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+//                                        CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
+//                                        CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), isCheck, 2, NameFamily);
+
+                                //////////////////////////////////////////////////////////////////////////////////////////////
+
+                                ChatIUDModel chatIUDModel = new ChatIUDModel();
+                                chatIUDModel.setID(Integer.valueOf(msgID));
+                                chatIUDModel.setOpMode(2);
+                                chatIUDModel.setKCode(Integer.valueOf(messages.get(0).getOperatorID()));
+                                chatIUDModel.setPCode(messages.get(0).getDriverID());
+                                chatIUDModel.setMessage("");
+                                chatIUDModel.setSenderType(true);
+                                chatIUDModel.setMessageType(0);
+                                chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
+                                chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
+                                chatIUDModel.setIpAddress("");
+                                chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
+                                chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
+                                chatIUDModel.setRemoveBoth(isCheck);
+
+                                ChatIUD(chatIUDModel);
+
+
                             } catch (Exception ignored) {
 
                             }
@@ -231,4 +260,104 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
         alertDialog.show();
     }
 
+    public static void ChatIUD(final ChatIUDModel chatIUDModel) {
+        try {
+
+            new CommonClass().ShowWaitingDialog(ChatClass.context, context.getString(R.string.Downloading));
+            APIService service =
+                    ServiceGenerator.GetCommonClient().create(APIService.class);
+            Call<Integer> call2 = service.ChatIUD(chatIUDModel, null);
+            call2.enqueue(new Callback<Integer>() {
+                @Override
+                public void onResponse(@Nullable Call<Integer> call, @Nullable Response<Integer> response) {
+
+                    if (response != null && response.isSuccessful()) {
+                        if (response.body() != null) {
+
+                            notifSignallR(chatIUDModel.getOpMode(), response.body(), chatIUDModel.getMessage(), chatIUDModel.getMessageType(), chatIUDModel.getKCode());
+
+                        } else {
+
+                            new CommonClass().CancelWaitingDialog();
+
+                            int errMsg = 0;
+                            if (response != null) {
+                                errMsg = response.raw().code();
+                            }
+                            if (errMsg != 0) {
+                                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                            } else {
+                                if (response != null) {
+                                    new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                                }
+                            }
+
+                            Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                        }
+                    } else {
+
+                        new CommonClass().CancelWaitingDialog();
+
+                        int errMsg = 0;
+                        if (response != null) {
+                            errMsg = response.raw().code();
+                        }
+                        if (errMsg != 0) {
+                            new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                        } else {
+                            if (response != null) {
+                                new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                            }
+                        }
+
+                        Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                    }
+
+
+                }
+
+
+                @Override
+                public void onFailure(@Nullable Call<Integer> call, @Nullable Throwable t) {
+                    new CommonClass().CancelWaitingDialog();
+
+                    if (t != null) {
+                        if (ChatClass.context != null)
+                            new CommonClass().ShowToast(ChatClass.context, CommonClass.ToastMessages.Network_Problem, t.getMessage());
+                    }
+
+                }
+            });
+        } catch (Exception ex) {
+            new CommonClass().CancelWaitingDialog();
+            if (ChatClass.context != null) {
+                String d = ex.getMessage();
+                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(11, ChatClass.context) + d, Toast.LENGTH_SHORT);
+
+            }
+        }
+
+
+    }
+
+    public static void notifSignallR(int OpMode, int ID, String message, int msgType, int id) {
+
+
+        try {
+
+            hub.invoke(ActivityChat.EXTRA_CHAT_NOTIFICATION, OpMode, ID, message, driverID, NameFamily, id, msgType);
+
+        } catch (Exception e) {
+
+            Analytics.trackEvent("ChatAC_" + "sendMessage " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
+
+        }
+
+
+    }
+
+
 }
+

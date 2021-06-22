@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Distribution.iml" filepath="$PROJECT_DIR$/../Distribution.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../DistributionApp/DistributionApp.iml" filepath="$PROJECT_DIR$/../DistributionApp/DistributionApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/androidchatlibrary.iml" filepath="$PROJECT_DIR$/androidchatlibrary.iml" />
+    </modules>
+  </component>
+</project>
