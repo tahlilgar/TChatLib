@@ -45,19 +45,19 @@ public class Download {
                 @Override
                 public void onResponse(@Nullable Call<ResponseBody> call, @Nullable Response<ResponseBody> response) {
 
-                        if (response != null && response.isSuccessful()) {
-                            // String ext = response.headers().get("type");
-                            name = fileName;
+                    if (response != null && response.isSuccessful()) {
+                        // String ext = response.headers().get("type");
+                        name = fileName;
 
-                            PathName = CommonClass.FilesPath + "/" + name;
-                            //  PathName=MainActivity.context.getExternalFilesDir(null) + File.separator + UUID.randomUUID()+"."+ext;
-                            // MainActivity.ComObj.ShowToast(MainActivity.context, "شروع دانلود فایل "+pos+" از تیکت شماره " +ticketFileName.getTicketID()+"...", Toast.LENGTH_SHORT);
-                            DownloadStatus.setText(context.getString( R.string.Downloading));
+                        PathName = CommonClass.FilesPath + "/" + name;
+                        //  PathName=MainActivity.context.getExternalFilesDir(null) + File.separator + UUID.randomUUID()+"."+ext;
+                        // MainActivity.ComObj.ShowToast(MainActivity.context, "شروع دانلود فایل "+pos+" از تیکت شماره " +ticketFileName.getTicketID()+"...", Toast.LENGTH_SHORT);
+                        DownloadStatus.setText(context.getString(R.string.Downloading));
 
 
-                            // MainActivity.ComObj.ShowToast(MainActivity.context,response.body()+"s", Toast.LENGTH_LONG);
-                            if (writeResponseBodyToDisk(response.body(), DownloadStatus, messageType)){
-                                new CommonClass().CancelWaitingDialog();
+                        // MainActivity.ComObj.ShowToast(MainActivity.context,response.body()+"s", Toast.LENGTH_LONG);
+                        if (writeResponseBodyToDisk(response.body(), DownloadStatus, messageType)) {
+                            new CommonClass().CancelWaitingDialog();
 
                            /* Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(PathName));
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -69,45 +69,42 @@ public class Download {
                                 Toast.makeText(MainActivity.context, "فایل بار گذاری شد اما برنامه مناسب برای باز کردن فایل پیدا نشد!", Toast.LENGTH_LONG).show();*/
 
 
-                            }
-                            else {
-                                new CommonClass().CancelWaitingDialog();
-
-                                try {
-                                    DownloadStatus.setText(context.getString( R.string.DownloadFailed));
-
-
-                                } catch (Exception ignored) {
-
-                                }
-
-
-                            }
-
-                        }
-                        else {
-
+                        } else {
                             new CommonClass().CancelWaitingDialog();
 
-                            int errMsg= 0;
-                            if (response != null) {
-                                errMsg = response.raw().code();
-                            }
-                            if (errMsg!=0) {
-                                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg,ChatClass.context ), Toast.LENGTH_SHORT );
-                            }
-                            else {
-                                if (response != null) {
-                                    new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
-                                }
-                            }
+                            try {
+                                DownloadStatus.setText(context.getString(R.string.DownloadFailed));
 
-                            Analytics.trackEvent("Download_" + "DownloadAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_"+DeviceProperty+"_"  + errMsg);
 
-                            DownloadStatus.setText(context.getString( R.string.DownloadFailed));
+                            } catch (Exception ignored) {
+
+                            }
 
 
                         }
+
+                    } else {
+
+                        new CommonClass().CancelWaitingDialog();
+
+                        int errMsg = 0;
+                        if (response != null) {
+                            errMsg = response.raw().code();
+                        }
+                        if (errMsg != 0) {
+                            new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                        } else {
+                            if (response != null) {
+                                new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                            }
+                        }
+
+                        Analytics.trackEvent("Download_" + "DownloadAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                        DownloadStatus.setText(context.getString(R.string.DownloadFailed));
+
+
+                    }
 
 
                 }

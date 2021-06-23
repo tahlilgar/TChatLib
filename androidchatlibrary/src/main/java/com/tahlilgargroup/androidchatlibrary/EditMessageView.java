@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-
 import java.util.List;
 
 public class EditMessageView extends FrameLayout {
@@ -34,15 +33,14 @@ public class EditMessageView extends FrameLayout {
         init();
     }
 
-   private void init()
-   {
-       View view = inflate(getContext(), R.layout.edit_message_tool, null);
-       addView(view);
+    private void init() {
+        View view = inflate(getContext(), R.layout.edit_message_tool, null);
+        addView(view);
 
-       BtnOkEdit= view.findViewById(R.id.BtnOkEditMsg);
-       BtnCancelEdit=view.findViewById(R.id.BtnCancelEditMsg);
-       txtMessage=view.findViewById(R.id.txtEditMessage);
-   }
+        BtnOkEdit = view.findViewById(R.id.BtnOkEditMsg);
+        BtnCancelEdit = view.findViewById(R.id.BtnCancelEditMsg);
+        txtMessage = view.findViewById(R.id.txtEditMessage);
+    }
 
     public View getBtnOkEdit() {
         return BtnOkEdit;

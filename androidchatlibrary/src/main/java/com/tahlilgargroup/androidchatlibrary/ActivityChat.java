@@ -176,6 +176,23 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     boolean isNew = false;
 
     List<Server_Message> UnreadReceivedMessages = new ArrayList<>();
+    RecyclerView msgRecyclerView;
+
+    ////////////////////////////send message to signalr server
+    public static void sendMessage(String message, int msgType) {
+
+
+        String SERVER_METHOD_SEND = "Send";
+        try {
+            hub.invoke(SERVER_METHOD_SEND, Integer.parseInt(id), driverID, message, true, msgType,
+                    CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
+                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
+                    CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", 0, false, 0, NameFamily);
+            //Int16 KCode, string RCode, string Msgtext, bool SenderType, byte MsgType, string IMEI, float Lat, float Lng, string MachinName,
+            // string ipAddress, string BrowserType, Int64 ID = 0, bool RemoveBoth = false, byte OpMode = 0
+
+        } catch (Exception e) {
 
     public static void notifSignallR(int OpMode, int ID, String message, int msgType, int id) {
 
@@ -863,7 +880,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                                     if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
 
-                                       // new DoCommand_MessageDB(context).deleteAllMessages();
+                                        // new DoCommand_MessageDB(context).deleteAllMessages();
                                         chatAppMsgAdapter.clear();
 
                                     }
@@ -927,10 +944,10 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                     }
                                 }
                                 else {//پیامهایی که از سرورمیاد حتما بیشتر یا مساوی پیام های من هست پس احتمال اجرای این دستور بسیار پایین است چون من تعداد پیام هایی که دارم رو میدم ،همون تعداد یا بیشتر(پیام خوانده نشده) دریافت میکنم
-                                   /* if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
-                                        *//*0*//*
-                                        *//* diff*//*
-                                       *//* if (msgRecyclerView.getAdapter().getItemCount() > response.body().size()) {
+                                    /* if (Objects.requireNonNull(msgRecyclerView.getAdapter()).getItemCount() > Objects.requireNonNull(response.body()).size()) {
+                                     *//*0*//*
+                                     *//* diff*//*
+                                     *//* if (msgRecyclerView.getAdapter().getItemCount() > response.body().size()) {
                                             msgDtoList.subList(response.body().size(), msgRecyclerView.getAdapter().getItemCount()-1).clear();
                                         }
 
@@ -1505,8 +1522,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                                         }
                                     }
-                                } else
-                                    if (method.equals("resultChangeStatusChat")) {
+                                } else if (method.equals("resultChangeStatusChat")) {
                                     //اپراتور یکی از پیام های ما را خوانده پس این سمت برای پیام علامت خوانده شده میخورد
                                     JsonArray json = jsonObject.getAsJsonArray("A");
                                     if (json.get(1).getAsString().equals(driverID))
@@ -1532,8 +1548,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                                 break;
                                             }
                                         }
-                                }
-                                    else if (method.equals("returnChangeStatusList")) {
+                                } else if (method.equals("returnChangeStatusList")) {
                                     //لیستی از پیام های ما که اپراتور خوانده
                                     JsonArray json = jsonObject.getAsJsonArray("A");
                                     JsonArray MsgSeenListID = json.get(0).getAsJsonArray();
@@ -1842,7 +1857,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                     today.setToNow();
 
                     String time = (today.format("%k:%M:%S"));  // Current time
-                   // name = "" + driverID + "-" + id + "-" + CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-').replace('+','0'); //UUID.randomUUID().toString();
+                    // name = "" + driverID + "-" + id + "-" + CommonClass.GetCurrentMDate().replace('/', '-') + "-" + time.replace(':', '-').replace('+','0'); //UUID.randomUUID().toString();
                     name = (driverID + "-" +
                             id + "-" +
                             CommonClass.GetCurrentMDate().replace('/', '-').trim() +
@@ -1999,8 +2014,8 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                 String time = (today.format("%k:%M:%S"));
 
-               // name = "" + driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-').trim() + "-" + time.replace(':', '-').replace('+','0').trim();// UUID.randomUUID().toString();
-                  name = (driverID + "-" +
+                // name = "" + driverID + "-" + id + "-" + /*ChangeDate.getCurrentDate()*/CommonClass.GetCurrentMDate().replace('/', '-').trim() + "-" + time.replace(':', '-').replace('+','0').trim();// UUID.randomUUID().toString();
+                name = (driverID + "-" +
                         id + "-" +
                         CommonClass.GetCurrentMDate().replace('/', '-').trim() +
                         "-" + time.replace(':', '-').replace('+','0').trim()).replace(' ','0');

@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -185,7 +184,7 @@ public class ChatClass {
                 final String NOTIFICATION_CHANNEL_ID = "10001";
                 //ActivityChat.id = jsonArray.get(2).getAsString();
 
-               // String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ context.getResources().getString(R.string.label);
+                // String notification_title = /*jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(7).getAsString() :*/ context.getResources().getString(R.string.label);
                 String notification_message = jsonArray != null && jsonArray.size() != 0 ? jsonArray.get(0).getAsString() : "پیام جدید";
 
                 Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -193,7 +192,7 @@ public class ChatClass {
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(R.drawable.tahlil)
-                               // .setContentTitle(notification_title)
+                                // .setContentTitle(notification_title)
                                 .setContentText(notification_message)
                                 .setAutoCancel(true)
                                 .setVibrate(new long[]{100, 200, 300, 400/*, 500, 400, 300, 200, 400*/})

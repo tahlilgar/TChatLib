@@ -86,7 +86,7 @@ public class ActivityImage extends AppCompatActivity {
 
 
                 }else {
-    //////////////////////////////////////////////////////////try to download and save video
+                    //////////////////////////////////////////////////////////try to download and save video
                     String urlAddress="";
                     List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgPos = " + ImagePos + " and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id+"'");
                     String MsgID="";
@@ -106,7 +106,7 @@ public class ActivityImage extends AppCompatActivity {
                         myDir.mkdir();
                     }*/
 
-                   // DownloadTask.isComplete = false;
+                    // DownloadTask.isComplete = false;
                     if (isConnectingToInternet()) {
                         Download download=new Download();
                         if ( filename.length() != 0)
@@ -123,7 +123,7 @@ public class ActivityImage extends AppCompatActivity {
             Log.e("Error", Objects.requireNonNull(e.getMessage()));
             e.printStackTrace();
         }
-       // img.setImageBitmap(bmp);
+        // img.setImageBitmap(bmp);
 
 
     }
@@ -148,7 +148,7 @@ public class ActivityImage extends AppCompatActivity {
         if (ExternalStorageUtil.isExternalStorageMounted()) {
 
             FileOutputStream fos = null;
-           // img.setImageBitmap(myBitmap);
+            // img.setImageBitmap(myBitmap);
             File myDir = new File(/*root + "/tahlilgar"*/CommonClass.FilesPath);
             myDir.mkdirs();
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();

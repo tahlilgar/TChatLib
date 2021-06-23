@@ -181,15 +181,14 @@ public class ActivityVideo extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         //we use onSaveInstanceState in order to store the video playback position for orientation change
-       try {
+        try {
 
-           savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
-           myVideoView.pause();
-       }catch (Exception e)
-       {
-           Analytics.trackEvent("VideoAC_" + "onSaveInstanceState " + driverID + "_" + CommonClass.GetCurrentMDate() + "_"+DeviceProperty+"_"  + e.getMessage());
+            savedInstanceState.putInt("Position", myVideoView.getCurrentPosition());
+            myVideoView.pause();
+        } catch (Exception e) {
+            Analytics.trackEvent("VideoAC_" + "onSaveInstanceState " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
 
-       }
+        }
     }
 
     @Override

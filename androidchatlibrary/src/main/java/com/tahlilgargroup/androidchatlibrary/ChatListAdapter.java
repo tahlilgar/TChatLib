@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -38,15 +37,15 @@ public class ChatListAdapter extends ArrayAdapter<ChatListModel> {
         // 2. Get rowView from inflater
 
         View rowView = null;
-            rowView = Objects.requireNonNull(inflater).inflate(R.layout.list_item_chat, parent, false);
+        rowView = Objects.requireNonNull(inflater).inflate(R.layout.list_item_chat, parent, false);
 
-            // 3. Get icon,title & counter views from the rowView
-            TextView titleView = (TextView) rowView.findViewById(R.id.item_title);
-            TextView counterView = (TextView) rowView.findViewById(R.id.item_counter);
+        // 3. Get icon,title & counter views from the rowView
+        TextView titleView = (TextView) rowView.findViewById(R.id.item_title);
+        TextView counterView = (TextView) rowView.findViewById(R.id.item_counter);
 
-            // 4. Set the text for textView
-            titleView.setText(modelsArrayList.get(position).getTitle());
-            counterView.setText(modelsArrayList.get(position).getCounter());
+        // 4. Set the text for textView
+        titleView.setText(modelsArrayList.get(position).getTitle());
+        counterView.setText(modelsArrayList.get(position).getCounter());
 
 
 
