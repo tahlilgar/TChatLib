@@ -88,7 +88,6 @@ import static com.tahlilgargroup.androidchatlibrary.ChatClass.ActivityChatList;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.Locate;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.NameFamily;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.SignalRUrl;
-import static com.tahlilgargroup.androidchatlibrary.ChatClass.appCode;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.driverID;
 import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
@@ -109,6 +108,10 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     public static ChatAppMsgDTO msgDto;
     static ChatAppMsgAdapter chatAppMsgAdapter;
 
+
+    public static final String EXTRA_CHAT_NOTIFICATION = "ChatNotification";
+    public static final String EXTRA_ADD_NEW_MESSAGE = "addNewMessage";
+    public static final String EXTRA_RESULT_MESSAGE_UPDATE_DELETE = "resultMessageUpdateDelete";
 
     //control that can't edit message when is in recording voice
     public static boolean IsRecordingVoice = false;
@@ -174,19 +177,12 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     List<Server_Message> UnreadReceivedMessages = new ArrayList<>();
     RecyclerView msgRecyclerView;
 
-    ////////////////////////////send message to signalr server
-    public static void sendMessage(String message, int msgType) {
+    public static void notifSignallR(int OpMode, int ID, String message, int msgType, int id) {
 
 
-        String SERVER_METHOD_SEND = "Send";
         try {
-            hub.invoke(SERVER_METHOD_SEND, Integer.parseInt(id), driverID, message, true, msgType,
-                    CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
-                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
-                    CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", 0, false, 0, NameFamily);
-            //Int16 KCode, string RCode, string Msgtext, bool SenderType, byte MsgType, string IMEI, float Lat, float Lng, string MachinName,
-            // string ipAddress, string BrowserType, Int64 ID = 0, bool RemoveBoth = false, byte OpMode = 0
+
+            hub.invoke(EXTRA_CHAT_NOTIFICATION, OpMode, ID, message, driverID, NameFamily, id, msgType);
 
         } catch (Exception e) {
 
@@ -194,284 +190,49 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
         }
 
+
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        try {
-            setContentView(com.tahlilgargroup.androidchatlibrary.R.layout.activity_chat);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-            context = this;
-            fm = getFragmentManager();
-
-
-            try {
-
-                if(!Locate.equals(""))
-                {
-                    //set language
-                    Locale localeNew = null;
-
-                    localeNew = new Locale(Locate);
-                    Locale.setDefault(localeNew);
-
-                    Resources res = getResources();
-                    Configuration newConfig = new Configuration(res.getConfiguration());
-                    newConfig.locale = localeNew;
-                    newConfig.setLayoutDirection(localeNew);
-                    res.updateConfiguration(newConfig, res.getDisplayMetrics());
-
-                    newConfig.setLocale(localeNew);
-                    createConfigurationContext(newConfig);
-
-
-                }
-            }catch (Exception e)
-            {
-                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
-            }
-
-
-            new CommonClass().DetectGPSTurn(ActivityChat.this);
-
-            //////////////////////////////////////set operator id
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-                if (extras.containsKey("position")) {
-                    if (extras.getString("position") != null && Objects.requireNonNull(extras.getString("position")).contains("-")) {
-                        String[] operator = Objects.requireNonNull(extras.getString("position")).split("-");
-                        id = operator[0];
-                        OperatorName = operator[1];
-                    }
-                    if (id == null)
-                        id = extras.getString("position");
-
-                }
-
-            }
-
-            init();
-
-
-            // پاک کردن نوتیکیشن پیام های این اپراتور
-            NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            if (nMgr != null) {
-                nMgr.cancel(Integer.parseInt(id));//.cancelAll();
-            }
-
-            //TODO Set driverID
-            //تنظیم کد راننده
-            //ChatClass.driverID = new DoCommand_UserDB(ActivityChat.this).getListOfUsers().getCode();
-
-
-            //مجوز دسترسی به میکروفون
-            if (new CommonClass().CheckForPermission(ActivityChat.this, Manifest.permission.RECORD_AUDIO))
-                audioRecordView.setRecordingListener(this);
-            else
-                new CommonClass().askForPermission(ActivityChat.this, Manifest.permission.RECORD_AUDIO, CommonClass.AUDIO);
-
-
-            //انتخاب فایل
-            audioRecordView.getAttachmentView().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    if (new CommonClass().CheckForPermission(ActivityChat.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        ///////////select image
-                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                        photoPickerIntent.setType("image/video/*");
-                        ////////////onActivityResult
-                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-                    } else {
-                        new CommonClass().askForPermission(ActivityChat.this, Manifest.permission.READ_EXTERNAL_STORAGE, CommonClass.READ_EXST);
-                        // audioRecordView.getAttachmentView().callOnClick();
-                    }
-
-                }
-            });
-
-            //اگر پیام خالی نیس و به اینترنت متصلیم پیام ارسال کن
-            audioRecordView.getSendView().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    msgContent = audioRecordView.getMessageView().getText().toString();//msgInputText.getText().toString();
-                    if (!TextUtils.isEmpty(msgContent.trim()) && msgContent.trim().length() != 0) {
-                        if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting) {
-                            if (new CommonClass().GpsIsActive(ActivityChat.this)) {
-                                sendMessage(msgContent.trim(), 0);
-                                ActivityChat.this.sendingState(0);
-                                audioRecordView.getMessageView().setText("");
-
-                            } else {
-                                new CommonClass().ActiveGPSMessage(ActivityChat.this);
-                            }
-
-                        } else
-                            new CommonClass().ShowToast(ActivityChat.this.getApplicationContext(), CommonClass.ToastMessages.Is_Disconnect, "");
-
-
-                    } else {
-                        new CommonClass().ShowToast(ActivityChat.this.getApplicationContext(), "پیام حاوی متن نیست!", Toast.LENGTH_SHORT);
-                    }
-
-                }
-            });
-
-            //پاک کردن کش ریسایکلر ویو
-            msgRecyclerView.getRecycledViewPool().clear();
-            chatAppMsgAdapter.notifyDataSetChanged();
-
-            //گرفتن پیام ها از دیتابیس
-            GetMessagesFromDB();
-
-
-            //اگر به اینترنت متصل هستیم پیام هارا از سرور بگیر
-            if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting && new CommonClass().isConnectingToInternet(ActivityChat.this)) {
-
-                isSwiping = false;
-                getServerMessagesSwip();
-                // getServerMessages();
-
-            } else {
-                if (loading != null && animation != null) {
-                    loading.setVisibility(View.GONE);
-                    animation.stop();
-                }
-                new CommonClass().ShowToast(getApplicationContext(), CommonClass.ToastMessages.Is_Disconnect, "");
-
-            }
-
-            //بروزرسانی وضعیت اتصال
-            StartTimer();
-
-            //Todo uncomment
-            connection.error(new ErrorCallback() {
-
-                @Override
-                public void onError(final Throwable error) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-
-                        }
-                    });
-
-                }
-            });
-
-            hub.subscribe(new Object() {
-                @SuppressWarnings("unused")
-                public void messageReceived(final String name, final String message) {
-
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            // Toast.makeText(getApplicationContext(), name + ": " + message, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
-
-
-            //پیام هایی ک در سیگنال آر رد و بدل میشوند
-            MessageRecive();
-
-
-            mySwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    //  getServerMessages();
-                    if (audioRecordView.getVisibility() == View.VISIBLE) {
-                        isSwiping = true;
-                        ActivityChat.this.getServerMessagesSwip();
-                    } else {
-                        mySwipe.setRefreshing(false);
-                        new CommonClass().ShowToast(ActivityChat.this, getResources().getString(R.string.FinishEditMessageFirst), Toast.LENGTH_SHORT);
-                    }
-                    //اعمالی را که میخواهیم هنگام تازه سازی انجام شود
-
-                }
-            });
-
-            //ویرایش پیام
-            editMessageView.getBtnOkEdit().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-
-                    ActivityChat.audioRecordView.setVisibility(View.VISIBLE);
-                    ActivityChat.editMessageView.setVisibility(View.GONE);
-                    //اگر پیام ویرایش شده کاملا خالی نیست تغیرات را اعمال کن
-                    if (editMessageView.getTxtMessage().getText().toString().length() != 0) {
-                        List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages("MsgID = '" + MessageCmdAdapter.chatAppMsgDTO.getID() + "' AND isSend = 1");
-                        if (messagelist.size() != 0) {
-                            String msgID = messagelist.get(0).getMsgID();
-                            if (ActivityChat.connection.getState() == ConnectionState.Connected &&
-                                    ActivityChat.connection.getState() != ConnectionState.Reconnecting &&
-                                    ActivityChat.connection.getState() != ConnectionState.Connecting) {
-
-                                try {
-                                    hub.invoke("Send", messagelist.get(0).getOperatorID(), messagelist.get(0).getDriverID(), editMessageView.getTxtMessage().getText().toString(), true, 0,
-                                            CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
-                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
-                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
-                                            CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), true, 1, NameFamily);
-
-                                    //ActivityChat.hub.invoke("messageUpdateDelete", 0, BigInteger.valueOf(Long.parseLong(msgID)), editMessageView.getTxtMessage().getText().toString(), true, 1);//byte OpMode 0 update 1 delete,int64 id,MsgText,bool RemoveBoth,byte SenderType(if bool false senderType is 1)
-
-                                } catch (Exception e) {
-                                    Analytics.trackEvent("ChatAC_" + "onCreate " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
-
-                                }
-                            } else {
-                                new CommonClass().ShowToast(ActivityChat.context, CommonClass.ToastMessages.Is_Disconnect, "");
-                            }
-
-
-                        }
-                    }
-                }
-            });
-
-            //لغو ویرایش پیام
-            editMessageView.getBtnCancelEdit().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    editMessageView.getTxtMessage().setText("");
-                    audioRecordView.setVisibility(View.VISIBLE);
-                    editMessageView.setVisibility(View.GONE);
-                }
-            });
-
-            //دریافت فایل برای اشتراک گذاری از دیگر برنامه ها
-            if (ChatClass.IsReceiveFromOtherApp) {
-                switch (ChatClass.otherAppFileType) {
-                    case text: {
-                        handleSendText(ChatClass.intent);
-                        break;
-                    }
-                    case image: {
-                        SendImage(ChatClass.intent);
-                        break;
-                    }
-                    case video: {
-                        SendVideo(ChatClass.intent);
-                        break;
-                    }
-                }
-            }
-
-           /* TransportClass.setShowCaseView_(true, TransportClass.HelpPart.chat,
-                    R.id.speakmsgImg, null, "تبدیل صوت به پیام متنی",
-                    "پیامتان را بگویید تا اپلیکیشن تایپ کند!", ActivityChat.this);*/
-        } catch (Exception e) {
-
-            Analytics.trackEvent("ActivityChat" + "_" + "onCreate" + "_" + DeviceProperty + "_" + CommonClass.GetCurrentMDate() + "_" + e.getMessage());
-
-        }
-
+    ////////////////////////////send message to signalr server
+    public void sendMessage(String message, int msgType, int isSendStatus, MultipartBody.Part file) {
+
+
+        ChatIUDModel chatIUDModel = new ChatIUDModel();
+        chatIUDModel.setID(0);
+        chatIUDModel.setOpMode(0);
+        chatIUDModel.setKCode(Integer.parseInt(id));
+        chatIUDModel.setPCode(driverID);
+        chatIUDModel.setMessage(message);
+        chatIUDModel.setSenderType(true);
+        chatIUDModel.setMessageType(msgType);
+        chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
+        chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
+        chatIUDModel.setIpAddress("");
+        chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
+        chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
+        chatIUDModel.setRemoveBoth(false);
+        ChatIUD(chatIUDModel, file, isSendStatus);
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
+
+//        String SERVER_METHOD_SEND = "Send";
+//        try {
+//            hub.invoke(SERVER_METHOD_SEND, Integer.parseInt(id), driverID, message, true, msgType,
+//                    CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
+//                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+//                    CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
+//                    CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", 0, false, 0,NameFamily);
+//            //Int16 KCode, string RCode, string Msgtext, bool SenderType, byte MsgType, string IMEI, float Lat, float Lng, string MachinName,
+//            // string ipAddress, string BrowserType, Int64 ID = 0, bool RemoveBoth = false, byte OpMode = 0
+//
+//        } catch (Exception e) {
+//
+//            Analytics.trackEvent("ChatAC_" + "sendMessage " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
+//
+//        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
     }
 
@@ -1064,262 +825,306 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
     }
 
-    /////////////////////////Json
-    private void MessageRecive() {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        connection.received(new MessageReceivedHandler() {
-            @Override
-            public void onMessageReceived(final JsonElement json) {
-                runOnUiThread(new Runnable() {
-                    @RequiresApi(api = Build.VERSION_CODES.O)
-                    public void run() {
-                        JsonObject jsonObject = json.getAsJsonObject();
-                        if (jsonObject != null && jsonObject.has("A")) {
-                            try {
+        try {
+            setContentView(com.tahlilgargroup.androidchatlibrary.R.layout.activity_chat);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-                                String method = jsonObject.get("M").getAsString();
-                                if (method.equals("addNewMessage")) {//دریافت پیام جدید
-
-                                    //Msgtext, senderid, ReceiverId, persianDate.simpleDate(),GetTimeNow(), MsgType, Convert.ToInt32(MsgID), SenderName
-                                    jsonArray = jsonObject.getAsJsonArray("A");
-                                    if (jsonArray != null && jsonArray.size() != 0) {
-                                        if (jsonArray.get(2).getAsString().trim().equals(driverID))//هرپیامی برای من اومد ناتیفکیشن باید بده
-                                            Notify();
-                                        if (jsonArray.get(1).getAsString().equals(id) && jsonArray.get(2).getAsString().trim().equals(driverID)) {
-                                            //agar operator folanie va bara man ferestade
-
-                                            if (jsonArray.get(5).getAsInt() == 0) {//نوع پیام متنی
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.MSG_TYPE_RECEIVED,
-                                                        jsonArray.get(0).getAsString(),
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            } else if (jsonArray.get(5).getAsInt() == 1) {//نوع پیام عکس
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.IMG_TYPE_RECEIVED,
-                                                        jsonArray.get(0).getAsString(),
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            } else if (jsonArray.get(5).getAsInt() == 2) {//نوع پیام فیلم
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Video_TYPE_RECEIVED,
-                                                        jsonArray.get(0).getAsString(),
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            } else if (jsonArray.get(5).getAsInt() == 3) {//نوع پیام صدا
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Voice_TYPE_RECEIVED,
-                                                        jsonArray.get(0).getAsString(),
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            }
-                                            int newMsgPosition = msgDtoList.size();
-                                            msgDtoList.add(msgDto);
-                                            //msgDtoList.set(jsonArray.get(6).getAsInt(), msgDto);
-                                            chatAppMsgAdapter.notifyItemInserted(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
-                                            msgRecyclerView.scrollToPosition(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
-
-                                            //اگر هنگام دریافت صفحه چت باز باشه پیام خونده میشه و باید به اپراتور اطلاع داده بشه
-                                            if (active)
-                                                readMsg(jsonArray.get(6).getAsInt());
-
-                                            //ذخیره پیام در دیتابیس محلی
-                                            boolean res = CallDBMethods.MessageCommands(-1, jsonArray.get(6).getAsString().equals("") ? connection.getMessageId() : jsonArray.get(6).getAsString(),
-                                                    driverID, "", jsonArray.get(5).getAsInt(), CommonClass.FilesPath + "/" + jsonArray.get(0).getAsString(),
-                                                    jsonArray.get(0).getAsString(), jsonArray.get(3).getAsString(), jsonArray.get(4).getAsString(), newMsgPosition,
-                                                    id, 0, -1, ActivityChat.this, CallDBMethods.CommandType.Insert, 0);
+            context = this;
+            fm = getFragmentManager();
 
 
-                                            if (!res)
-                                                new CommonClass().ShowToast(getApplicationContext(), "ذخیره نشد", Toast.LENGTH_SHORT);
-                                            isNew = true;
-                                        } else if (jsonArray.get(1).getAsString().equals(driverID) && jsonArray.get(2).getAsString().trim().equals(id)) {
-                                            //agar man ferestadam (2==sender id)
+            try {
 
-                                            // if (msgDtoList.get(jsonArray.get(6).getAsInt()).getTime() == "در حال ارسال...") {
+                if (!Locate.equals("")) {
+                    //set language
+                    Locale localeNew = null;
 
-                                            // msgDtoList.get(index).setTime(jsonArray.get(5).getAsString());
-                                            //  ChatAppMsgAdapter.Sendstate = ChatAppMsgAdapter.state.send;
-                                            if (jsonArray.get(5).getAsInt() == 0) {
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.MSG_TYPE_SENT,
-                                                        msgContent,
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
+                    localeNew = new Locale(Locate);
+                    Locale.setDefault(localeNew);
 
-                                            } else if (jsonArray.get(5).getAsInt() == 1) {
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.IMG_TYPE_SENT,
-                                                        LocalPath,
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
+                    Resources res = getResources();
+                    Configuration newConfig = new Configuration(res.getConfiguration());
+                    newConfig.locale = localeNew;
+                    newConfig.setLayoutDirection(localeNew);
+                    res.updateConfiguration(newConfig, res.getDisplayMetrics());
 
-                                            } else if (jsonArray.get(5).getAsInt() == 2) {
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Video_TYPE_SENT,
-                                                        LocalPath,
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            } else if (jsonArray.get(5).getAsInt() == 3) {
-                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Voice_TYPE_SENT,
-                                                        msgContent,
-                                                        "",
-                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
-                                                        jsonArray.get(6).getAsBigInteger(), false);
-
-                                            }
-                                            // int newMsgPosition = msgDtoList.size();
-                                            //  msgDtoList.add(msgDto);
-                                            //int newMsgPosition = msgDtoList.size() - 1;
-                                            //index = newMsgPosition;
-
-                                            // chatAppMsgAdapter.notifyItemInserted(/*jsonArray.get(6).getAsInt()*/newMsgPosition);
-                                            //  msgRecyclerView.scrollToPosition(/*jsonArray.get(6).getAsInt()*/newMsgPosition);
-
-                                            msgDtoList.set(newMsgPosition/*jsonArray.get(6).getAsInt()*/, msgDto);
-                                            chatAppMsgAdapter.notifyItemChanged(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
-                                            msgRecyclerView.scrollToPosition(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
+                    newConfig.setLocale(localeNew);
+                    createConfigurationContext(newConfig);
 
 
-                                            String filename = LocalPath == null || LocalPath.length() == 0 ? "" : LocalPath.substring(Objects.requireNonNull(LocalPath).lastIndexOf("/") + 1);
-                                            if (messageType != 0)
-                                                msgContent = /*filename.equals("") ? "" : CommonClass.FilesURL + */filename;
-                                            boolean res = CallDBMethods.MessageCommands(-1, jsonArray.get(6).getAsString().equals("") ? connection.getMessageId() : jsonArray.get(6).getAsString(), driverID,
-                                                    "", messageType, LocalPath, msgContent, jsonArray.get(3).getAsString(), jsonArray.get(4).getAsString(), newMsgPosition, id, 1, -1,
-                                                    ActivityChat.this, CallDBMethods.CommandType.Insert, 0);
-
-                                            if (!res)
-                                                Toast.makeText(getApplicationContext(), "ذخیره نشد", Toast.LENGTH_SHORT).show();
-                                            isNew = false;
-                                            //  }
-
-                                        }
-                                    }
-                                } else if (method.equals("resultChangeStatusChat")) {
-                                    //اپراتور یکی از پیام های ما را خوانده پس این سمت برای پیام علامت خوانده شده میخورد
-                                    JsonArray json = jsonObject.getAsJsonArray("A");
-                                    if (json.get(1).getAsString().equals(driverID))
-                                        for (int i = msgDtoList.size() - 1; i >= 0; i--) {
-                                            if (msgDtoList.get(i).getID().equals(json.get(0).getAsBigInteger())) {
-                                                msgDto = new ChatAppMsgDTO(msgDtoList.get(i).getMsgType(), msgDtoList.get(i).getMsgContent(), "", new CommonClass().PerisanNumber(msgDtoList.get(i).getTime()), true, json.get(0).getAsBigInteger(), msgDtoList.get(i).isEdited());
-                                                msgDtoList.set(i, msgDto);
-                                                chatAppMsgAdapter.notifyItemChanged(i);
-
-                                                List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"MsgID = '" + json.get(0).getAsString() + "' AND isSend = 1");
-                                                if (messagelist.size() != 0) {
-                                                    int uniqDBId = messagelist.get(0).getID();
-                                                    String[] s = msgDtoList.get(i).getTime().split("\n");
-
-                                                    CallDBMethods.MessageCommands(uniqDBId, json.get(0).getAsString(), driverID, "", messagelist.get(0).getMsgType(),
-                                                            CommonClass.FilesPath + "/" + msgDtoList.get(i).getMsgContent(), msgDtoList.get(i).getMsgContent(), s[0],
-                                                            s[1], i, id, 1, 1, ActivityChat.this, CallDBMethods.CommandType.Update, msgDtoList.get(i).isEdited() ? 1 : 0);
+                }
+            } catch (Exception e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
 
 
-                                                }
+            new CommonClass().DetectGPSTurn(ActivityChat.this);
 
-                                                //  msgRecyclerView.scrollToPosition(i);
-                                                break;
-                                            }
-                                        }
-                                } else if (method.equals("returnChangeStatusList")) {
-                                    //لیستی از پیام های ما که اپراتور خوانده
-                                    JsonArray json = jsonObject.getAsJsonArray("A");
-                                    JsonArray MsgSeenListID = json.get(0).getAsJsonArray();
-                                    if (json.get(1).getAsString().equals(driverID)) {
-                                        for (int j = 0; j < MsgSeenListID.size(); j++) {
-                                            for (int i = msgDtoList.size() - 1; i >= 0; i--) {
-                                                if (msgDtoList.get(i).getID().equals(MsgSeenListID.get(j).getAsBigInteger())) {
-                                                    msgDto = new ChatAppMsgDTO(msgDtoList.get(i).getMsgType(), msgDtoList.get(i).getMsgContent(), "", new CommonClass().PerisanNumber(msgDtoList.get(i).getTime()), true, MsgSeenListID.get(j).getAsBigInteger(), msgDtoList.get(i).isEdited());
-                                                    msgDtoList.set(i, msgDto);
-                                                    chatAppMsgAdapter.notifyItemChanged(i);
+            //////////////////////////////////////set operator id
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                if (extras.containsKey("position")) {
+                    if (extras.getString("position") != null && Objects.requireNonNull(extras.getString("position")).contains("-")) {
+                        String[] operator = Objects.requireNonNull(extras.getString("position")).split("-");
+                        id = operator[0];
+                        OperatorName = operator[1];
+                    }
+                    if (id == null)
+                        id = extras.getString("position");
 
-                                                    List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"MsgID = '" + MsgSeenListID.get(j).getAsString() + "' AND isSend = 1");
-                                                    if (messagelist.size() != 0) {
-                                                        int uniqDBId = messagelist.get(0).getID();
-                                                        String[] s = msgDtoList.get(i).getTime().split("\n");
+                }
 
-                                                        CallDBMethods.MessageCommands(uniqDBId, MsgSeenListID.get(j).getAsString(), driverID, "", messagelist.get(0).getMsgType(),
-                                                                CommonClass.FilesPath + "/" + msgDtoList.get(i).getMsgContent(), msgDtoList.get(i).getMsgContent(), s[0], s[1],
-                                                                i, id, 1, 1, ActivityChat.this, CallDBMethods.CommandType.Update, msgDtoList.get(i).isEdited() ? 1 : 0);
+            }
+
+            init();
 
 
-                                                    }
+            // پاک کردن نوتیکیشن پیام های این اپراتور
+            NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nMgr != null) {
+                nMgr.cancel(Integer.parseInt(id));//.cancelAll();
+            }
+
+            //TODO Set driverID
+            //تنظیم کد راننده
+            //ChatClass.driverID = new DoCommand_UserDB(ActivityChat.this).getListOfUsers().getCode();
 
 
-                                                    break;
-
-                                                }
-
-                                            }
-                                        }
-                                    }
-                                } else if (method.equals("resultMessageUpdateDelete")) {
-                                    JsonArray json = jsonObject.getAsJsonArray("A");
-
-                                    String Msid = json.get(0).getAsString();
-                                    String TextMsg = json.get(1).getAsString();
-                                    boolean result = json.get(2).getAsBoolean();
-                                    String ResultMsg = json.get(3).getAsString();
-                                    byte OpMode = json.get(4).getAsByte();
-
-                                    if (result) {
-                                        if (OpMode == 2) {
-
-                                            List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgID = '" + Msid + "' and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id + "'");
-                                            if (messages.size() != 0) {
-                                                int pos = messages.get(0).getMsgPos();
-                                                msgDtoList.remove(pos);
-                                                chatAppMsgAdapter.notifyItemRemoved(pos);
-                                                chatAppMsgAdapter.notifyDataSetChanged();
-                                                new DoCommand_MessageDB(ActivityChat.context).deleteMessage(Msid);
-                                            }
-                                        } else if (OpMode == 1) {
-                                            List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgID = '" + Msid + "' and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id + "'");
-                                            if (messages.size() != 0) {
-                                                int pos = messages.get(0).getMsgPos();// MessageCmdAdapter.EditMsgPsition;
-
-                                                msgDto = new ChatAppMsgDTO(MessageCmdAdapter.chatAppMsgDTO.getMsgType(),
-                                                        editMessageView.getTxtMessage().getText().toString(),
-                                                        MessageCmdAdapter.chatAppMsgDTO.getOperatorName(),
-                                                        MessageCmdAdapter.chatAppMsgDTO.getTime(),
-                                                        MessageCmdAdapter.chatAppMsgDTO.isSeen(),
-                                                        MessageCmdAdapter.chatAppMsgDTO.getID(), true);
-
-                                                msgDtoList.set(pos, msgDto);
-                                                chatAppMsgAdapter.notifyItemChanged(pos);
+            //مجوز دسترسی به میکروفون
+            if (new CommonClass().CheckForPermission(ActivityChat.this, Manifest.permission.RECORD_AUDIO))
+                audioRecordView.setRecordingListener(this);
+            else
+                new CommonClass().askForPermission(ActivityChat.this, Manifest.permission.RECORD_AUDIO, CommonClass.AUDIO);
 
 
-                                                //جایگزاری پیام ویرایش شده در لیست چت ها
-                                                //todo jaygozari maqadir static ba maqadir vakeshi az database
-                                                int uniqDBId = messages.get(0).getID();
-                                                String[] s = MessageCmdAdapter.chatAppMsgDTO.getTime().split("\n");
-                                                CallDBMethods.MessageCommands(uniqDBId, MessageCmdAdapter.chatAppMsgDTO.getID().toString(), driverID, "", messages.get(0).getMsgType(),
-                                                        "", editMessageView.getTxtMessage().getText().toString(), s[0],
-                                                        s[1], pos, id, 1, MessageCmdAdapter.chatAppMsgDTO.isSeen() ? 1 : 0, ActivityChat.this, CallDBMethods.CommandType.Update, 1);
+            //انتخاب فایل
+            audioRecordView.getAttachmentView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                                                editMessageView.getTxtMessage().setText("");
 
-                                            }
-                                        }
-                                    } else {
-                                        new CommonClass().ShowToast(ActivityChat.this, ResultMsg, Toast.LENGTH_SHORT);
-                                    }
-                                }
-                            } catch (Exception e) {
+                    if (new CommonClass().CheckForPermission(ActivityChat.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        ///////////select image
+                        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                        photoPickerIntent.setType("image/video/*");
+                        ////////////onActivityResult
+                        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                    } else {
+                        new CommonClass().askForPermission(ActivityChat.this, Manifest.permission.READ_EXTERNAL_STORAGE, CommonClass.READ_EXST);
+                        // audioRecordView.getAttachmentView().callOnClick();
+                    }
 
-                                Analytics.trackEvent("ChatAC_" + "MessageRecive " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
+                }
+            });
 
+            //اگر پیام خالی نیس و به اینترنت متصلیم پیام ارسال کن
+            audioRecordView.getSendView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    msgContent = audioRecordView.getMessageView().getText().toString();//msgInputText.getText().toString();
+                    if (!TextUtils.isEmpty(msgContent.trim()) && msgContent.trim().length() != 0) {
+                        if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting) {
+                            if (new CommonClass().GpsIsActive(ActivityChat.this)) {
+                                sendMessage(msgContent.trim(), 0, 0, null);
+                                sendingState(0);
+                                audioRecordView.getMessageView().setText("");
+
+                            } else {
+                                new CommonClass().ActiveGPSMessage(ActivityChat.this);
                             }
+
+                        } else
+                            new CommonClass().ShowToast(ActivityChat.this.getApplicationContext(), CommonClass.ToastMessages.Is_Disconnect, "");
+
+
+                    } else {
+                        new CommonClass().ShowToast(ActivityChat.this.getApplicationContext(), "پیام حاوی متن نیست!", Toast.LENGTH_SHORT);
+                    }
+
+                }
+            });
+
+            //پاک کردن کش ریسایکلر ویو
+            msgRecyclerView.getRecycledViewPool().clear();
+            chatAppMsgAdapter.notifyDataSetChanged();
+
+            //گرفتن پیام ها از دیتابیس
+            GetMessagesFromDB();
+
+
+            //اگر به اینترنت متصل هستیم پیام هارا از سرور بگیر
+            if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting && new CommonClass().isConnectingToInternet(ActivityChat.this)) {
+
+                isSwiping = false;
+                getServerMessagesSwip();
+                // getServerMessages();
+
+            } else {
+                if (loading != null && animation != null) {
+                    loading.setVisibility(View.GONE);
+                    animation.stop();
+                }
+                new CommonClass().ShowToast(getApplicationContext(), CommonClass.ToastMessages.Is_Disconnect, "");
+
+            }
+
+            //بروزرسانی وضعیت اتصال
+            StartTimer();
+
+            //Todo uncomment
+            connection.error(new ErrorCallback() {
+
+                @Override
+                public void onError(final Throwable error) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+
+                        }
+                    });
+
+                }
+            });
+
+            hub.subscribe(new Object() {
+                @SuppressWarnings("unused")
+                public void messageReceived(final String name, final String message) {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            // Toast.makeText(getApplicationContext(), name + ": " + message, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+
+
+            //پیام هایی ک در سیگنال آر رد و بدل میشوند
+            MessageRecive();
+
+
+            mySwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    //  getServerMessages();
+                    if (audioRecordView.getVisibility() == View.VISIBLE) {
+                        isSwiping = true;
+                        ActivityChat.this.getServerMessagesSwip();
+                    } else {
+                        mySwipe.setRefreshing(false);
+                        new CommonClass().ShowToast(ActivityChat.this, getResources().getString(R.string.FinishEditMessageFirst), Toast.LENGTH_SHORT);
+                    }
+                    //اعمالی را که میخواهیم هنگام تازه سازی انجام شود
+
+                }
+            });
+
+            //ویرایش پیام
+            editMessageView.getBtnOkEdit().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+
+                    ActivityChat.audioRecordView.setVisibility(View.VISIBLE);
+                    ActivityChat.editMessageView.setVisibility(View.GONE);
+                    //اگر پیام ویرایش شده کاملا خالی نیست تغیرات را اعمال کن
+                    if (editMessageView.getTxtMessage().getText().toString().length() != 0) {
+                        List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages("MsgID = '" + MessageCmdAdapter.chatAppMsgDTO.getID() + "' AND isSend = 1");
+                        if (messagelist.size() != 0) {
+                            String msgID = messagelist.get(0).getMsgID();
+                            if (ActivityChat.connection.getState() == ConnectionState.Connected &&
+                                    ActivityChat.connection.getState() != ConnectionState.Reconnecting &&
+                                    ActivityChat.connection.getState() != ConnectionState.Connecting) {
+
+
+                                ChatIUDModel chatIUDModel = new ChatIUDModel();
+                                chatIUDModel.setID(Integer.valueOf(msgID));
+                                chatIUDModel.setOpMode(1);
+                                chatIUDModel.setKCode(Integer.valueOf(messagelist.get(0).getOperatorID()));
+                                chatIUDModel.setPCode(messagelist.get(0).getDriverID());
+                                chatIUDModel.setMessage(editMessageView.getTxtMessage().getText().toString());
+                                chatIUDModel.setSenderType(true);
+                                chatIUDModel.setMessageType(0);
+                                chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
+                                chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
+                                chatIUDModel.setIpAddress("");
+                                chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
+                                chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
+                                chatIUDModel.setRemoveBoth(true);
+
+                                ChatIUD(chatIUDModel, null, 50);
+
+                                //////////////////////////////////////////////////////////////////////////////////////////////
+
+//                                try {
+//                                    hub.invoke("Send", messagelist.get(0).getOperatorID(), messagelist.get(0).getDriverID(), editMessageView.getTxtMessage().getText().toString(), true, 0,
+//                                            CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "",
+//                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0,
+//                                            CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0,
+//                                            CommonClass.DeviceName != null ? CommonClass.DeviceName : "", "", "", BigInteger.valueOf(Long.parseLong(msgID)), true, 1,NameFamily);
+//
+//                                    //ActivityChat.hub.invoke("messageUpdateDelete", 0, BigInteger.valueOf(Long.parseLong(msgID)), editMessageView.getTxtMessage().getText().toString(), true, 1);//byte OpMode 0 update 1 delete,int64 id,MsgText,bool RemoveBoth,byte SenderType(if bool false senderType is 1)
+//
+//                                } catch (Exception e) {
+//                                    Analytics.trackEvent("ChatAC_" + "onCreate " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
+//
+//                                }
+
+
+                                //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+                            } else {
+                                new CommonClass().ShowToast(ActivityChat.context, CommonClass.ToastMessages.Is_Disconnect, "");
+                            }
+
+
                         }
                     }
-                });
+                }
+            });
+
+            //لغو ویرایش پیام
+            editMessageView.getBtnCancelEdit().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    editMessageView.getTxtMessage().setText("");
+                    audioRecordView.setVisibility(View.VISIBLE);
+                    editMessageView.setVisibility(View.GONE);
+                }
+            });
+
+            //دریافت فایل برای اشتراک گذاری از دیگر برنامه ها
+            if (ChatClass.IsReceiveFromOtherApp) {
+                switch (ChatClass.otherAppFileType) {
+                    case text: {
+                        handleSendText(ChatClass.intent);
+                        break;
+                    }
+                    case image: {
+                        SendImage(ChatClass.intent);
+                        break;
+                    }
+                    case video: {
+                        SendVideo(ChatClass.intent);
+                        break;
+                    }
+                }
             }
-        });
+
+           /* TransportClass.setShowCaseView_(true, TransportClass.HelpPart.chat,
+                    R.id.speakmsgImg, null, "تبدیل صوت به پیام متنی",
+                    "پیامتان را بگویید تا اپلیکیشن تایپ کند!", ActivityChat.this);*/
+        } catch (Exception e) {
+
+            Analytics.trackEvent("ActivityChat" + "_" + "onCreate" + "_" + DeviceProperty + "_" + CommonClass.GetCurrentMDate() + "_" + e.getMessage());
+
+        }
+
+
     }
 
     //خواندن یک پیام اپراتور
@@ -1561,77 +1366,262 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
         }
     }
 
-    private void UploadFile(final String FilePath, final int msgType) {
+    /////////////////////////Json
+    private void MessageRecive() {
 
-        if (new CommonClass().GpsIsActive(ActivityChat.this)) {
-            try {
-                final ProgressDialog pd = new ProgressDialog(this);
-                pd.setMessage(getResources().getString(R.string.sending));
-                pd.setCancelable(false);
-                pd.show();
+        connection.received(new MessageReceivedHandler() {
+            @Override
+            public void onMessageReceived(final JsonElement json) {
+                runOnUiThread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    public void run() {
+                        JsonObject jsonObject = json.getAsJsonObject();
+                        if (jsonObject != null && jsonObject.has("A")) {
+                            try {
+
+                                String method = jsonObject.get("M").getAsString();
+                                if (method.equals(EXTRA_ADD_NEW_MESSAGE)) {//دریافت پیام جدید
+                                    //Msgtext, senderid, ReceiverId, persianDate.simpleDate(),GetTimeNow(), MsgType, Convert.ToInt32(MsgID), SenderName
+                                    jsonArray = jsonObject.getAsJsonArray("A");
+                                    if (jsonArray != null && jsonArray.size() != 0) {
+                                        if (jsonArray.get(2).getAsString().trim().equals(driverID))//هرپیامی برای من اومد ناتیفکیشن باید بده
+                                            Notify();
+                                        if (jsonArray.get(1).getAsString().equals(id) && jsonArray.get(2).getAsString().trim().equals(driverID)) {
+                                            //agar operator folanie va bara man ferestade
+
+                                            if (jsonArray.get(5).getAsInt() == 0) {//نوع پیام متنی
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.MSG_TYPE_RECEIVED,
+                                                        jsonArray.get(0).getAsString(),
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 1) {//نوع پیام عکس
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.IMG_TYPE_RECEIVED,
+                                                        jsonArray.get(0).getAsString(),
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 2) {//نوع پیام فیلم
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Video_TYPE_RECEIVED,
+                                                        jsonArray.get(0).getAsString(),
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 3) {//نوع پیام صدا
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Voice_TYPE_RECEIVED,
+                                                        jsonArray.get(0).getAsString(),
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            }
+                                            int newMsgPosition = msgDtoList.size();
+                                            msgDtoList.add(msgDto);
+                                            //msgDtoList.set(jsonArray.get(6).getAsInt(), msgDto);
+                                            chatAppMsgAdapter.notifyItemInserted(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
+                                            msgRecyclerView.scrollToPosition(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
+
+                                            //اگر هنگام دریافت صفحه چت باز باشه پیام خونده میشه و باید به اپراتور اطلاع داده بشه
+                                            if (active)
+                                                readMsg(jsonArray.get(6).getAsInt());
+
+                                            //ذخیره پیام در دیتابیس محلی
+                                            boolean res = CallDBMethods.MessageCommands(-1, jsonArray.get(6).getAsString().equals("") ? connection.getMessageId() : jsonArray.get(6).getAsString(),
+                                                    driverID, "", jsonArray.get(5).getAsInt(), CommonClass.FilesPath + "/" + jsonArray.get(0).getAsString(),
+                                                    jsonArray.get(0).getAsString(), jsonArray.get(3).getAsString(), jsonArray.get(4).getAsString(), newMsgPosition,
+                                                    id, 0, -1, ActivityChat.this, CallDBMethods.CommandType.Insert, 0);
 
 
-                //creating a file
-                File file = new File(FilePath);
-                //creating request body for file
-                RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file",/* file.getName()*/ URLEncoder.encode(file.getName(), "utf-8"), requestFile);
+                                            if (!res)
+                                                new CommonClass().ShowToast(getApplicationContext(), "ذخیره نشد", Toast.LENGTH_SHORT);
+                                            isNew = true;
+                                        } else if (jsonArray.get(1).getAsString().equals(driverID) && jsonArray.get(2).getAsString().trim().equals(id)) {
+                                            //agar man ferestadam (2==sender id)
+
+                                            // if (msgDtoList.get(jsonArray.get(6).getAsInt()).getTime() == "در حال ارسال...") {
+
+                                            // msgDtoList.get(index).setTime(jsonArray.get(5).getAsString());
+                                            //  ChatAppMsgAdapter.Sendstate = ChatAppMsgAdapter.state.send;
+                                            if (jsonArray.get(5).getAsInt() == 0) {
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.MSG_TYPE_SENT,
+                                                        msgContent,
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 1) {
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.IMG_TYPE_SENT,
+                                                        LocalPath,
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 2) {
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Video_TYPE_SENT,
+                                                        LocalPath,
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            } else if (jsonArray.get(5).getAsInt() == 3) {
+                                                msgDto = new ChatAppMsgDTO(ChatAppMsgDTO.Voice_TYPE_SENT,
+                                                        msgContent,
+                                                        "",
+                                                        new CommonClass().PerisanNumber(jsonArray.get(3).getAsString() + "\n" + jsonArray.get(4).getAsString()),
+                                                        jsonArray.get(6).getAsBigInteger(), false);
+
+                                            }
+                                            // int newMsgPosition = msgDtoList.size();
+                                            //  msgDtoList.add(msgDto);
+                                            //int newMsgPosition = msgDtoList.size() - 1;
+                                            //index = newMsgPosition;
+
+                                            // chatAppMsgAdapter.notifyItemInserted(/*jsonArray.get(6).getAsInt()*/newMsgPosition);
+                                            //  msgRecyclerView.scrollToPosition(/*jsonArray.get(6).getAsInt()*/newMsgPosition);
+
+                                            msgDtoList.set(newMsgPosition/*jsonArray.get(6).getAsInt()*/, msgDto);
+                                            chatAppMsgAdapter.notifyItemChanged(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
+                                            msgRecyclerView.scrollToPosition(newMsgPosition/*jsonArray.get(6).getAsInt()*/);
 
 
-                APIService service =
-                        ServiceGenerator.GetCommonClient().create(APIService.class);
+                                            String filename = LocalPath == null || LocalPath.length() == 0 ? "" : LocalPath.substring(Objects.requireNonNull(LocalPath).lastIndexOf("/") + 1);
+                                            if (messageType != 0)
+                                                msgContent = /*filename.equals("") ? "" : CommonClass.FilesURL + */filename;
+                                            boolean res = CallDBMethods.MessageCommands(-1, jsonArray.get(6).getAsString().equals("") ? connection.getMessageId() : jsonArray.get(6).getAsString(), driverID,
+                                                    "", messageType, LocalPath, msgContent, jsonArray.get(3).getAsString(), jsonArray.get(4).getAsString(), newMsgPosition, id, 1, -1,
+                                                    ActivityChat.this, CallDBMethods.CommandType.Insert, 0);
 
-                Call<String> call = service.uploadMulFiles(body/*, ChatClass.driverID, id, driverName*/, appCode);
-                call.enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(@Nullable Call<String> call,
-                                           @Nullable Response<String> response) {
+                                            if (!res)
+                                                Toast.makeText(getApplicationContext(), "ذخیره نشد", Toast.LENGTH_SHORT).show();
+                                            isNew = false;
+                                            //  }
 
-                        if (response != null && response.isSuccessful()) {
-                            //  MainActivity.new CommonClass().ShowToast(activity_new_ticket.this, response.body() + "", Toast.LENGTH_SHORT);
-                            //اگر فایل اپلود شد به سیگنال آر پیام بده
-                            pd.cancel();
-                            String filename = FilePath.substring(Objects.requireNonNull(FilePath).lastIndexOf("/") + 1);
-                            sendMessage(filename, msgType);
-                            sendingState(msgType);
-                            //  UploadResult = true;
-                        } else {
-                            int errMsg = response.raw().code();
-                            if (errMsg != 0) {
-                                new CommonClass().ShowToast(ActivityChat.this, new CommonClass().ErrorMessages(errMsg, ActivityChat.this), Toast.LENGTH_SHORT);
-                            } else {
-                                new CommonClass().ShowToast(ActivityChat.this, response.raw().message(), Toast.LENGTH_SHORT);
+                                        }
+                                    }
+                                } else if (method.equals("resultChangeStatusChat")) {
+                                    //اپراتور یکی از پیام های ما را خوانده پس این سمت برای پیام علامت خوانده شده میخورد
+                                    JsonArray json = jsonObject.getAsJsonArray("A");
+                                    if (json.get(1).getAsString().equals(driverID))
+                                        for (int i = msgDtoList.size() - 1; i >= 0; i--) {
+                                            if (msgDtoList.get(i).getID().equals(json.get(0).getAsBigInteger())) {
+                                                msgDto = new ChatAppMsgDTO(msgDtoList.get(i).getMsgType(), msgDtoList.get(i).getMsgContent(), "", new CommonClass().PerisanNumber(msgDtoList.get(i).getTime()), true, json.get(0).getAsBigInteger(), msgDtoList.get(i).isEdited());
+                                                msgDtoList.set(i, msgDto);
+                                                chatAppMsgAdapter.notifyItemChanged(i);
+
+                                                List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"MsgID = '" + json.get(0).getAsString() + "' AND isSend = 1");
+                                                if (messagelist.size() != 0) {
+                                                    int uniqDBId = messagelist.get(0).getID();
+                                                    String[] s = msgDtoList.get(i).getTime().split("\n");
+
+                                                    CallDBMethods.MessageCommands(uniqDBId, json.get(0).getAsString(), driverID, "", messagelist.get(0).getMsgType(),
+                                                            CommonClass.FilesPath + "/" + msgDtoList.get(i).getMsgContent(), msgDtoList.get(i).getMsgContent(), s[0],
+                                                            s[1], i, id, 1, 1, ActivityChat.this, CallDBMethods.CommandType.Update, msgDtoList.get(i).isEdited() ? 1 : 0);
+
+
+                                                }
+
+                                                //  msgRecyclerView.scrollToPosition(i);
+                                                break;
+                                            }
+                                        }
+                                } else if (method.equals("returnChangeStatusList")) {
+                                    //لیستی از پیام های ما که اپراتور خوانده
+                                    JsonArray json = jsonObject.getAsJsonArray("A");
+                                    JsonArray MsgSeenListID = json.get(0).getAsJsonArray();
+                                    if (json.get(1).getAsString().equals(driverID)) {
+                                        for (int j = 0; j < MsgSeenListID.size(); j++) {
+                                            for (int i = msgDtoList.size() - 1; i >= 0; i--) {
+                                                if (msgDtoList.get(i).getID().equals(MsgSeenListID.get(j).getAsBigInteger())) {
+                                                    msgDto = new ChatAppMsgDTO(msgDtoList.get(i).getMsgType(), msgDtoList.get(i).getMsgContent(), "", new CommonClass().PerisanNumber(msgDtoList.get(i).getTime()), true, MsgSeenListID.get(j).getAsBigInteger(), msgDtoList.get(i).isEdited());
+                                                    msgDtoList.set(i, msgDto);
+                                                    chatAppMsgAdapter.notifyItemChanged(i);
+
+                                                    List<Messages> messagelist = new DoCommand_MessageDB(context).getListOfMessages(/*"MsgID like '%%'"*/"MsgID = '" + MsgSeenListID.get(j).getAsString() + "' AND isSend = 1");
+                                                    if (messagelist.size() != 0) {
+                                                        int uniqDBId = messagelist.get(0).getID();
+                                                        String[] s = msgDtoList.get(i).getTime().split("\n");
+
+                                                        CallDBMethods.MessageCommands(uniqDBId, MsgSeenListID.get(j).getAsString(), driverID, "", messagelist.get(0).getMsgType(),
+                                                                CommonClass.FilesPath + "/" + msgDtoList.get(i).getMsgContent(), msgDtoList.get(i).getMsgContent(), s[0], s[1],
+                                                                i, id, 1, 1, ActivityChat.this, CallDBMethods.CommandType.Update, msgDtoList.get(i).isEdited() ? 1 : 0);
+
+
+                                                    }
+
+
+                                                    break;
+
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                } else if (method.equals(EXTRA_RESULT_MESSAGE_UPDATE_DELETE)) {
+
+                                    JsonArray json = jsonObject.getAsJsonArray("A");
+
+                                    String Msid = json.get(0).getAsString();
+                                    String TextMsg = json.get(1).getAsString();
+                                    boolean result = json.get(2).getAsBoolean();
+                                    String ResultMsg = json.get(3).getAsString();
+                                    byte OpMode = json.get(4).getAsByte();
+
+                                    if (result) {
+                                        if (OpMode == 2) {
+
+                                            List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgID = '" + Msid + "' and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id + "'");
+                                            if (messages.size() != 0) {
+                                                int pos = messages.get(0).getMsgPos();
+                                                msgDtoList.remove(pos);
+                                                chatAppMsgAdapter.notifyItemRemoved(pos);
+                                                chatAppMsgAdapter.notifyDataSetChanged();
+                                                new DoCommand_MessageDB(ActivityChat.context).deleteMessage(Msid);
+                                            }
+                                        } else if (OpMode == 1) {
+                                            List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgID = '" + Msid + "' and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id + "'");
+                                            if (messages.size() != 0) {
+                                                int pos = messages.get(0).getMsgPos();// MessageCmdAdapter.EditMsgPsition;
+
+                                                msgDto = new ChatAppMsgDTO(MessageCmdAdapter.chatAppMsgDTO.getMsgType(),
+                                                        editMessageView.getTxtMessage().getText().toString(),
+                                                        MessageCmdAdapter.chatAppMsgDTO.getOperatorName(),
+                                                        MessageCmdAdapter.chatAppMsgDTO.getTime(),
+                                                        MessageCmdAdapter.chatAppMsgDTO.isSeen(),
+                                                        MessageCmdAdapter.chatAppMsgDTO.getID(), true);
+
+                                                msgDtoList.set(pos, msgDto);
+                                                chatAppMsgAdapter.notifyItemChanged(pos);
+
+
+                                                //جایگزاری پیام ویرایش شده در لیست چت ها
+                                                //todo jaygozari maqadir static ba maqadir vakeshi az database
+                                                int uniqDBId = messages.get(0).getID();
+                                                String[] s = MessageCmdAdapter.chatAppMsgDTO.getTime().split("\n");
+                                                CallDBMethods.MessageCommands(uniqDBId, MessageCmdAdapter.chatAppMsgDTO.getID().toString(), driverID, "", messages.get(0).getMsgType(),
+                                                        "", editMessageView.getTxtMessage().getText().toString(), s[0],
+                                                        s[1], pos, id, 1, MessageCmdAdapter.chatAppMsgDTO.isSeen() ? 1 : 0, ActivityChat.this, CallDBMethods.CommandType.Update, 1);
+
+                                                editMessageView.getTxtMessage().setText("");
+
+                                            }
+                                        }
+                                    } else {
+                                        new CommonClass().ShowToast(ActivityChat.this, ResultMsg, Toast.LENGTH_SHORT);
+                                    }
+                                }
+                            } catch (Exception e) {
+
+                                Analytics.trackEvent("ChatAC_" + "MessageRecive " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
+
                             }
-
-
-                            Analytics.trackEvent("ChatAC_" + "UploadFile1 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
-
-                            pd.cancel();
-                            new CommonClass().ShowToast(ActivityChat.this, getResources().getString(R.string.FailUpload), Toast.LENGTH_SHORT);
-                            // UploadResult = false;
                         }
-
-                    }
-
-                    @Override
-                    public void onFailure(@Nullable Call<String> call, @Nullable Throwable t) {
-                        if (t != null) {
-                            new CommonClass().ShowToast(ActivityChat.this, t.getMessage(), Toast.LENGTH_SHORT);
-                        }
-                        pd.cancel();
-                        // UploadResult = false;
                     }
                 });
-            } catch (Exception ex) {
-                Analytics.trackEvent("ChatAC_" + "UploadFile3 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + ex.getMessage());
-
-                String d = ex.getMessage();
-                new CommonClass().ShowToast(ActivityChat.this, new CommonClass().ErrorMessages(11, ActivityChat.this) + d, Toast.LENGTH_SHORT);
             }
-        } else {
-            new CommonClass().ActiveGPSMessage(ActivityChat.this);
-        }
-
+        });
     }
 
 
@@ -2097,6 +2087,175 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
             Analytics.trackEvent("ChatAC_" + "handleSendText " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + e.getMessage());
 
         }
+    }
+
+    private void UploadFile(final String FilePath, final int msgType) {
+
+        if (new CommonClass().GpsIsActive(ActivityChat.this)) {
+            try {
+                final ProgressDialog pd = new ProgressDialog(this);
+                pd.setMessage(getResources().getString(R.string.sending));
+                pd.setCancelable(false);
+                pd.show();
+
+
+                //creating a file
+                File file = new File(FilePath);
+                //creating request body for file
+                RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("uploaded_file",/* file.getName()*/ URLEncoder.encode(file.getName(), "utf-8"), requestFile);
+
+
+                //  MainActivity.new CommonClass().ShowToast(activity_new_ticket.this, response.body() + "", Toast.LENGTH_SHORT);
+                //اگر فایل اپلود شد به سیگنال آر پیام بده
+                String filename = FilePath.substring(Objects.requireNonNull(FilePath).lastIndexOf("/") + 1);
+                sendMessage(filename, msgType, msgType, body);
+                sendingState(msgType);
+
+
+//                APIService service =
+//                        ServiceGenerator.GetCommonClient().create(APIService.class);
+//
+//                Call<String> call = service.uploadMulFiles(body/*, ChatClass.driverID, id, driverName*/, appCode);
+//                call.enqueue(new Callback<String>() {
+//                    @Override
+//                    public void onResponse(@Nullable Call<String> call,
+//                                           @Nullable Response<String> response) {
+//
+//                        if (response != null && response.isSuccessful()) {
+//                            //  MainActivity.new CommonClass().ShowToast(activity_new_ticket.this, response.body() + "", Toast.LENGTH_SHORT);
+//                            //اگر فایل اپلود شد به سیگنال آر پیام بده
+//                            pd.cancel();
+//                            String filename = FilePath.substring(Objects.requireNonNull(FilePath).lastIndexOf("/") + 1);
+//                            sendMessage(filename, msgType);
+//                            sendingState(msgType);
+//                            //  UploadResult = true;
+//                        } else {
+//                            int errMsg = response.raw().code();
+//                            if (errMsg != 0) {
+//                                new CommonClass().ShowToast(ActivityChat.this, new CommonClass().ErrorMessages(errMsg, ActivityChat.this), Toast.LENGTH_SHORT);
+//                            } else {
+//                                new CommonClass().ShowToast(ActivityChat.this, response.raw().message(), Toast.LENGTH_SHORT);
+//                            }
+//
+//
+//                            Analytics.trackEvent("ChatAC_" + "UploadFile1 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+//
+//                            pd.cancel();
+//                            new CommonClass().ShowToast(ActivityChat.this, getResources().getString(R.string.FailUpload), Toast.LENGTH_SHORT);
+//                            // UploadResult = false;
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(@Nullable Call<String> call, @Nullable Throwable t) {
+//                        if (t != null) {
+//                            new CommonClass().ShowToast(ActivityChat.this, t.getMessage(), Toast.LENGTH_SHORT);
+//                        }
+//                        pd.cancel();
+//                        // UploadResult = false;
+//                    }
+//                });
+            } catch (Exception ex) {
+                Analytics.trackEvent("ChatAC_" + "UploadFile3 " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + ex.getMessage());
+
+                String d = ex.getMessage();
+                new CommonClass().ShowToast(ActivityChat.this, new CommonClass().ErrorMessages(11, ActivityChat.this) + d, Toast.LENGTH_SHORT);
+            }
+        } else {
+            new CommonClass().ActiveGPSMessage(ActivityChat.this);
+        }
+
+    }
+
+    public void ChatIUD(final ChatIUDModel chatIUDModel, MultipartBody.Part file, final int isSendStatus) {
+        final ProgressDialog pd = new ProgressDialog(ActivityChat.this);
+        pd.setMessage(getResources().getString(R.string.sending));
+        pd.setCancelable(false);
+        pd.show();
+        try {
+
+            new CommonClass().ShowWaitingDialog(ChatClass.context, context.getString(R.string.Downloading));
+            APIService service =
+                    ServiceGenerator.GetCommonClient().create(APIService.class);
+            Call<Integer> call2 = service.ChatIUD(chatIUDModel, file);
+            call2.enqueue(new Callback<Integer>() {
+                @Override
+                public void onResponse(@Nullable Call<Integer> call, @Nullable Response<Integer> response) {
+
+                    if (response != null && response.isSuccessful()) {
+                        if (response.body() != null) {
+
+                            notifSignallR(chatIUDModel.getOpMode(), response.body(), chatIUDModel.getMessage(), chatIUDModel.getMessageType(), chatIUDModel.getKCode());
+                            if (isSendStatus != 50) {
+                                sendingState(isSendStatus);
+                            }
+                        } else {
+
+                            new CommonClass().CancelWaitingDialog();
+
+                            int errMsg = 0;
+                            if (response != null) {
+                                errMsg = response.raw().code();
+                            }
+                            if (errMsg != 0) {
+                                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                            } else {
+                                if (response != null) {
+                                    new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                                }
+                            }
+
+                            Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                        }
+                    } else {
+
+                        new CommonClass().CancelWaitingDialog();
+
+                        int errMsg = 0;
+                        if (response != null) {
+                            errMsg = response.raw().code();
+                        }
+                        if (errMsg != 0) {
+                            new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                        } else {
+                            if (response != null) {
+                                new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                            }
+                        }
+
+                        Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                    }
+                    pd.cancel();
+
+                }
+
+
+                @Override
+                public void onFailure(@Nullable Call<Integer> call, @Nullable Throwable t) {
+                    new CommonClass().CancelWaitingDialog();
+
+                    if (t != null) {
+                        if (ChatClass.context != null)
+                            new CommonClass().ShowToast(ChatClass.context, CommonClass.ToastMessages.Network_Problem, t.getMessage());
+                    }
+                    pd.cancel();
+                }
+            });
+        } catch (Exception ex) {
+            new CommonClass().CancelWaitingDialog();
+            if (ChatClass.context != null) {
+                String d = ex.getMessage();
+                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(11, ChatClass.context) + d, Toast.LENGTH_SHORT);
+
+            }
+            pd.cancel();
+        }
+
+
     }
 
 
