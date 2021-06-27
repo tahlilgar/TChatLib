@@ -230,6 +230,7 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
                                 chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
                                 chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
                                 chatIUDModel.setIpAddress("");
+                                chatIUDModel.setBrowserType("");
                                 chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
                                 chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
                                 chatIUDModel.setRemoveBoth(isCheck);

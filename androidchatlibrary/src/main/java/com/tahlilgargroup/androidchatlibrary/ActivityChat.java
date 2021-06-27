@@ -176,6 +176,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
     List<Server_Message> UnreadReceivedMessages = new ArrayList<>();
     RecyclerView msgRecyclerView;
+    private ProgressDialog pd;
 
     public static void notifSignallR(int OpMode, int ID, String message, int msgType, int id) {
 
@@ -208,6 +209,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
         chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
         chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
         chatIUDModel.setIpAddress("");
+        chatIUDModel.setBrowserType("");
         chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
         chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
         chatIUDModel.setRemoveBoth(false);
@@ -239,6 +241,11 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     public void init() {
 
         try {
+
+            pd = new ProgressDialog(this);
+            pd.setMessage(getResources().getString(R.string.sending));
+            pd.setCancelable(false);
+
             audioRecordView = findViewById(R.id.recordingView);
 
             editMessageView = findViewById(R.id.EditTool);
@@ -930,7 +937,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                         if (connection.getState() == ConnectionState.Connected && connection.getState() != ConnectionState.Reconnecting && connection.getState() != ConnectionState.Connecting) {
                             if (new CommonClass().GpsIsActive(ActivityChat.this)) {
                                 sendMessage(msgContent.trim(), 0, 0, null);
-                                sendingState(0);
+                                //sendingState(0);
                                 audioRecordView.getMessageView().setText("");
 
                             } else {
@@ -1051,6 +1058,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                 chatIUDModel.setIMEI(CommonClass.DeviceIMEI != null ? CommonClass.DeviceIMEI : "");
                                 chatIUDModel.setMachineName(CommonClass.DeviceName != null ? CommonClass.DeviceName : "");
                                 chatIUDModel.setIpAddress("");
+                                chatIUDModel.setBrowserType("");
                                 chatIUDModel.setLat(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLatitude() : 0);
                                 chatIUDModel.setLng(CommonClass.mCurrentLocation != null ? CommonClass.mCurrentLocation.getLongitude() : 0);
                                 chatIUDModel.setRemoveBoth(true);
@@ -2093,9 +2101,6 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
         if (new CommonClass().GpsIsActive(ActivityChat.this)) {
             try {
-                final ProgressDialog pd = new ProgressDialog(this);
-                pd.setMessage(getResources().getString(R.string.sending));
-                pd.setCancelable(false);
                 pd.show();
 
 
@@ -2110,7 +2115,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                 //اگر فایل اپلود شد به سیگنال آر پیام بده
                 String filename = FilePath.substring(Objects.requireNonNull(FilePath).lastIndexOf("/") + 1);
                 sendMessage(filename, msgType, msgType, body);
-                sendingState(msgType);
+                //sendingState(msgType);
 
 
 //                APIService service =
@@ -2170,9 +2175,6 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     }
 
     public void ChatIUD(final ChatIUDModel chatIUDModel, MultipartBody.Part file, final int isSendStatus) {
-        final ProgressDialog pd = new ProgressDialog(ActivityChat.this);
-        pd.setMessage(getResources().getString(R.string.sending));
-        pd.setCancelable(false);
         pd.show();
         try {
 

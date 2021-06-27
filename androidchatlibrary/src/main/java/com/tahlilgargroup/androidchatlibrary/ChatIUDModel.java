@@ -12,6 +12,7 @@ public class ChatIUDModel {
     private String IMEI;
     private String MachineName;
     private String ipAddress;
+    private String BrowserType;
     private double Lat;
     private double Lng;
     private boolean RemoveBoth;//remove tow >true else false
@@ -118,5 +119,13 @@ public class ChatIUDModel {
 
     public void setRemoveBoth(boolean removeBoth) {
         RemoveBoth = removeBoth;
+    }
+
+    public String getBrowserType() {
+        return BrowserType;
+    }
+
+    public void setBrowserType(String browserType) {
+        BrowserType = browserType;
     }
 }

@@ -1,7 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tahlilgargroup.androidchatlibrary"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+    package="com.tahlilgargroup.androidchatlibrary">
 
     <!--<uses-feature
         android:name="android.hardware.camera"
@@ -54,4 +52,8 @@
         &lt;!&ndash;<service android:name=".Main.Services.PublicNotificationService"/>&ndash;&gt;
     </application>-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application>
+        <activity android:name=".ActivityImage" />
+        <activity android:name=".ActivityVideo" />
+    </application>
 </manifest>
