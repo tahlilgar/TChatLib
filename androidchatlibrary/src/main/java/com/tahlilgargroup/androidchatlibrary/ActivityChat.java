@@ -111,7 +111,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
     public static final String EXTRA_CHAT_NOTIFICATION = "ChatNotification";
     public static final String EXTRA_ADD_NEW_MESSAGE = "addNewMessage";
-    public static final String EXTRA_RESULT_MESSAGE_UPDATE_DELETE = "resultMessageUpdateDelete";
+    public static final String EXTRA_RESULT_MESSAGE_UPDATE_DELETE = "updateDeleteMessage";
 
     //control that can't edit message when is in recording voice
     public static boolean IsRecordingVoice = false;
@@ -1568,16 +1568,13 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                         }
                                     }
                                 } else if (method.equals(EXTRA_RESULT_MESSAGE_UPDATE_DELETE)) {
-
                                     JsonArray json = jsonObject.getAsJsonArray("A");
-
                                     String Msid = json.get(0).getAsString();
                                     String TextMsg = json.get(1).getAsString();
-                                    boolean result = json.get(2).getAsBoolean();
-                                    String ResultMsg = json.get(3).getAsString();
-                                    byte OpMode = json.get(4).getAsByte();
+                                    byte OpMode = json.get(2).getAsByte();
 
-                                    if (result) {
+
+                                    if (true) {
                                         if (OpMode == 2) {
 
                                             List<Messages> messages = new DoCommand_MessageDB(ActivityChat.context).getListOfMessages("MsgID = '" + Msid + "' and DriverID = '" + driverID + "' and OperatorID = '" + ActivityChat.id + "'");
@@ -1617,7 +1614,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                                             }
                                         }
                                     } else {
-                                        new CommonClass().ShowToast(ActivityChat.this, ResultMsg, Toast.LENGTH_SHORT);
+                                        new CommonClass().ShowToast(ActivityChat.this, "", Toast.LENGTH_SHORT);
                                     }
                                 }
                             } catch (Exception e) {
