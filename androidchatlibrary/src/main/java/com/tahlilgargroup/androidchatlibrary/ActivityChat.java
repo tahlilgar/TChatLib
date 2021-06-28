@@ -2175,7 +2175,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
         pd.show();
         try {
 
-            new CommonClass().ShowWaitingDialog(ChatClass.context, context.getString(R.string.Downloading));
+
             APIService service =
                     ServiceGenerator.GetCommonClient().create(APIService.class);
             Call<Integer> call2 = service.ChatIUD(chatIUDModel, file);

@@ -315,7 +315,7 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
                         Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
 
                     }
-
+                    new CommonClass().CancelWaitingDialog();
 
                 }
 
