@@ -2215,22 +2215,26 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
                         }
                     } else {
-
                         new CommonClass().CancelWaitingDialog();
-
-                        int errMsg = 0;
-                        if (response != null) {
-                            errMsg = response.raw().code();
-                        }
-                        if (errMsg != 0) {
-                            new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                        if (response.code() == 645) {
+                            new CommonClass().ShowToast(ChatClass.context, getResources().getString(R.string.FileSizeLarge), Toast.LENGTH_SHORT);
                         } else {
-                            if (response != null) {
-                                new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
-                            }
-                        }
 
-                        Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+                            int errMsg = 0;
+                            if (response != null) {
+                                errMsg = response.raw().code();
+                            }
+                            if (errMsg != 0) {
+                                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                            } else {
+                                if (response != null) {
+                                    new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                                }
+                            }
+
+                            Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
+                        }
 
                     }
                     pd.cancel();

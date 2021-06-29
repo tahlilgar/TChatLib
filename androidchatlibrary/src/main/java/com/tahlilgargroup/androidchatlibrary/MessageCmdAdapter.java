@@ -299,21 +299,25 @@ public class MessageCmdAdapter extends RecyclerView.Adapter<TellListViewHolder> 
                     } else {
 
                         new CommonClass().CancelWaitingDialog();
-
-                        int errMsg = 0;
-                        if (response != null) {
-                            errMsg = response.raw().code();
-                        }
-                        if (errMsg != 0) {
-                            new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                        if (response.code() == 645) {
+                            new CommonClass().ShowToast(ChatClass.context, context.getString(R.string.FileSizeLarge), Toast.LENGTH_SHORT);
                         } else {
+
+                            int errMsg = 0;
                             if (response != null) {
-                                new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                                errMsg = response.raw().code();
                             }
+                            if (errMsg != 0) {
+                                new CommonClass().ShowToast(ChatClass.context, new CommonClass().ErrorMessages(errMsg, ChatClass.context), Toast.LENGTH_SHORT);
+                            } else {
+                                if (response != null) {
+                                    new CommonClass().ShowToast(ChatClass.context, response.raw().message(), Toast.LENGTH_SHORT);
+                                }
+                            }
+
+                            Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
+
                         }
-
-                        Analytics.trackEvent("ChatIUD_" + "ChatIUDAPI " + driverID + "_" + CommonClass.GetCurrentMDate() + "_" + DeviceProperty + "_" + errMsg);
-
                     }
                     new CommonClass().CancelWaitingDialog();
 

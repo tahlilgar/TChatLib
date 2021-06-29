@@ -11,4 +11,5 @@
     <string name="DownloadFailed">Download failed</string>
     <string name="DownloadFrom">Download from</string>
     <string name="DownloadCompleted">Download completed</string>
+    <string name="FileSizeLarge">File size is large</string>
 </resources>

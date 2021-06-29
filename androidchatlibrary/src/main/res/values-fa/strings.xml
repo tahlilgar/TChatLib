@@ -11,4 +11,5 @@
     <string name="DownloadFailed">فایل دریافت نشد!</string>
     <string name="DownloadFrom">دانلود شده از</string>
     <string name="DownloadCompleted">بارگیری کامل شد</string>
+    <string name="FileSizeLarge">حجم فایل زیاد می باشد</string>
 </resources>
