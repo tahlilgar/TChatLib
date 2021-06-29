@@ -8,7 +8,6 @@ import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -24,7 +23,7 @@ public interface APIService {
     Call<ArrayList<Server_Message>> GetMessages(@Body DistributionChatParam distributionChatParam);
 
 
-    @GET("Common/ChatApi/GetFile")
+    @POST("Common/ChatApi/GetFile")
     @Headers("apiPass: r77FtM&b7m8Se%*4")
     Call<ResponseBody> DownloadFile(@Query("ID") String ID);/////////////////////////////////////////////////////
 
