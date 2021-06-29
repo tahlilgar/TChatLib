@@ -178,12 +178,17 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
     RecyclerView msgRecyclerView;
     private ProgressDialog pd;
 
-    public static void notifSignallR(int OpMode, int ID, String message, int msgType, int id) {
+    public static void notifSignallR(String nameFile, int OpMode, int ID, String message, int msgType, int id) {
 
-
+        String sendMessage = "";
+        if (OpMode == 0 && msgType != 0) {
+            sendMessage = nameFile;
+        } else {
+            sendMessage = message;
+        }
         try {
 
-            hub.invoke(EXTRA_CHAT_NOTIFICATION, OpMode, ID, message, driverID, NameFamily, id, msgType);
+            hub.invoke(ActivityChat.EXTRA_CHAT_NOTIFICATION, OpMode, ID, sendMessage, driverID, NameFamily, id, msgType);
 
         } catch (Exception e) {
 
@@ -2178,15 +2183,15 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
             APIService service =
                     ServiceGenerator.GetCommonClient().create(APIService.class);
-            Call<Integer> call2 = service.ChatIUD(chatIUDModel, file);
-            call2.enqueue(new Callback<Integer>() {
+            Call<List<String>> call2 = service.ChatIUD(chatIUDModel, file);
+            call2.enqueue(new Callback<List<String>>() {
                 @Override
-                public void onResponse(@Nullable Call<Integer> call, @Nullable Response<Integer> response) {
+                public void onResponse(@Nullable Call<List<String>> call, @Nullable Response<List<String>> response) {
 
                     if (response != null && response.isSuccessful()) {
                         if (response.body() != null) {
 
-                            notifSignallR(chatIUDModel.getOpMode(), response.body(), chatIUDModel.getMessage(), chatIUDModel.getMessageType(), chatIUDModel.getKCode());
+                            notifSignallR(response.body().get(1), chatIUDModel.getOpMode(), Integer.parseInt(response.body().get(0)), chatIUDModel.getMessage(), chatIUDModel.getMessageType(), chatIUDModel.getKCode());
                             if (isSendStatus != 50) {
                                 sendingState(isSendStatus);
                             }
@@ -2234,7 +2239,7 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
 
 
                 @Override
-                public void onFailure(@Nullable Call<Integer> call, @Nullable Throwable t) {
+                public void onFailure(@Nullable Call<List<String>> call, @Nullable Throwable t) {
                     new CommonClass().CancelWaitingDialog();
 
                     if (t != null) {
