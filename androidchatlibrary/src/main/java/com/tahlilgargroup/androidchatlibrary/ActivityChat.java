@@ -1384,7 +1384,6 @@ public class ActivityChat extends AppCompatActivity implements AudioRecordView.R
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     public void run() {
                         JsonObject jsonObject = json.getAsJsonObject();
-                        Log.e("RECEIVE SIGNAL", "result : " + jsonObject);
                         if (jsonObject != null && jsonObject.has("A")) {
                             try {
 

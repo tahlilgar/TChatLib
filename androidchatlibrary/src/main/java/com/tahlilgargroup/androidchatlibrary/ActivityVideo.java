@@ -40,6 +40,7 @@ public class ActivityVideo extends AppCompatActivity {
     private MediaController mediaControls;
     public static Handler handler;
     public static Runnable handlerTask;
+    private String idMessege;
     TextView downloadDoc;
 
     //نمایش فیلم در صورت وجود در حافظه و در غیر اینصورت دانلود و نمایش
@@ -72,6 +73,7 @@ public class ActivityVideo extends AppCompatActivity {
                 String uri = null;
                 if (extras != null) {
                     uri = extras.getString("Video");
+                    idMessege = extras.getString("idMessege");
                 }
 
                 File f = null;
@@ -92,7 +94,7 @@ public class ActivityVideo extends AppCompatActivity {
                         if (isConnectingToInternet()) {
                             Download download = new Download();
                             if ( filename.length() != 0)
-                                download.DownloadAPI( filename, downloadDoc, 2);
+                                download.DownloadAPI(idMessege, filename, downloadDoc, 2);
                             // new DownloadTask(ActivityVideo.this, downloadDoc, urlAddress, 2);
 
                         } else

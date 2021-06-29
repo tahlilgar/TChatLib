@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.microsoft.appcenter.analytics.Analytics;
 import com.tahlilgargroup.commonlibrary.CommonClass;
 
@@ -632,7 +631,7 @@ public class ChatAppMsgAdapter extends RecyclerView.Adapter<ChatAppMsgViewHolder
 
                         Download download = new Download();
                         if (fileName.length() != 0)
-                            download.DownloadAPI(fileName, isSend == 1 ? holder.VoiceSendName : holder.VoiceReciveName, 3);
+                            download.DownloadAPI(messages.get(0).getMsgID(), fileName, isSend == 1 ? holder.VoiceSendName : holder.VoiceReciveName, 3);
                         //message type 3 is voice
                     }
                 }
@@ -667,6 +666,7 @@ public class ChatAppMsgAdapter extends RecyclerView.Adapter<ChatAppMsgViewHolder
             if (msgType == 2 && !locPath.equals("")) {
                 Intent intent = new Intent(ActivityChat.context, ActivityVideo.class);
                 intent.putExtra("Video", locPath);
+                intent.putExtra("idMessege", messages.get(0).getMsgID());
                 ActivityChat.context.startActivity(intent);
             }
         }catch (Exception e)
@@ -694,6 +694,7 @@ public class ChatAppMsgAdapter extends RecyclerView.Adapter<ChatAppMsgViewHolder
                     //مسیر را به صفحه دانلود و نمایش عکس هدایت میکنیم
                     Intent intent = new Intent(ActivityChat.context, ActivityImage.class);
                     intent.putExtra("picture",/* messages.get(0).getImage()*/locPath);
+                    intent.putExtra("idMessege", messages.get(0).getMsgID());
                     ActivityChat.context.startActivity(intent);
 
                 }

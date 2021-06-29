@@ -26,7 +26,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.tahlilgargroup.androidchatlibrary.ChatClass.appCode;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.context;
 import static com.tahlilgargroup.androidchatlibrary.ChatClass.driverID;
 import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
@@ -34,13 +33,13 @@ import static com.tahlilgargroup.commonlibrary.CommonClass.DeviceProperty;
 
 
 public class Download {
-    public void DownloadAPI(final String fileName, final TextView DownloadStatus, final int messageType) {
+    public void DownloadAPI(String ID, final String fileName, final TextView DownloadStatus, final int messageType) {
         try {
 
             new CommonClass().ShowWaitingDialog(ChatClass.context,context.getString(R.string.Downloading));
             APIService service =
                     ServiceGenerator.GetCommonClient().create(APIService.class);
-            Call<ResponseBody> call2 = service.DownloadFile(/*0, 0,*/ fileName,appCode);
+            Call<ResponseBody> call2 = service.DownloadFile(ID);
             call2.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@Nullable Call<ResponseBody> call, @Nullable Response<ResponseBody> response) {

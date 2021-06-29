@@ -25,7 +25,7 @@ public interface APIService {
 
     @GET("Common/ChatApi/GetFile")
     @Headers("apiPass: r77FtM&b7m8Se%*4")
-    Call<ResponseBody> DownloadFile(@Query("FileName") String FileName,@Query("AppCode") int AppCode);/////////////////////////////////////////////////////
+    Call<ResponseBody> DownloadFile(@Query("ID") String ID);/////////////////////////////////////////////////////
 
     @Multipart
     @POST("Common/ChatApi/ChatIUD")

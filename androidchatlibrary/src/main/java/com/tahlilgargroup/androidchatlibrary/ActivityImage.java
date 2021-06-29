@@ -43,7 +43,7 @@ public class ActivityImage extends AppCompatActivity {
     public static TouchImageView img;
     Bitmap myBitmap=null;
     public static int ImagePos;
-    String filename,uri;
+    String filename, uri, idMessege;
     TextView downloadDoc;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class ActivityImage extends AppCompatActivity {
             //  byte[] byteArray = extras.getByteArray("picture");
             if (extras != null) {
                 uri = extras.getString("picture");
+                idMessege = extras.getString("idMessege");
             }
             if (uri != null) {
                 filename = uri.substring(Objects.requireNonNull(uri).lastIndexOf("/") + 1);
@@ -110,7 +111,7 @@ public class ActivityImage extends AppCompatActivity {
                     if (isConnectingToInternet()) {
                         Download download=new Download();
                         if ( filename.length() != 0)
-                            download.DownloadAPI(filename,downloadDoc,1);
+                            download.DownloadAPI(idMessege, filename, downloadDoc, 1);
                         // new DownloadTask(ActivityImage.this, downloadDoc, urlAddress,1);
                     }else
                         new CommonClass().ShowToast(ActivityImage.this, CommonClass.ToastMessages.Is_Disconnect, "");
